@@ -38,6 +38,9 @@ const config = {
                 sans: ['var(--font-sans)', ...fontFamily.sans],
                 monserrat: ['var(--font-monserrat)', ...fontFamily.mono],
             },
+            colors: {
+                magenta: '#E5017C',
+            },
         },
     },
     plugins: [require('tailwindcss-animate')],

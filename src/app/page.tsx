@@ -15,8 +15,8 @@ export default function Home() {
                     defaultSize={75}
                     className={'flex h-dvh flex-col pl-10 pt-11'}
                 >
-                    <h1 className='font-monserrat text-3xl font-black text-black'>
-                        JuLis Veranstaltungs-Template
+                    <h1 className='text-magenta font-monserrat text-3xl font-black'>
+                        JuLis Veranstaltungs-Template-Editor
                     </h1>
                     <div
                         className={
