@@ -1,5 +1,9 @@
 {
-  "name": "julis-veranstaltungs-template",
+  "name": "julis-veranstaltungs-template-editor",
+  "author": {
+    "name": "Torben Köhler",
+    "email": "me@torben.codes"
+  },
   "version": "0.1.0",
   "private": true,
   "scripts": {
