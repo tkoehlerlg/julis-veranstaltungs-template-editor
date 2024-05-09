@@ -25,6 +25,7 @@ export function SwitchButton({
         >
             {options.map((option) => (
                 <div
+                    key={option}
                     className={'relative select-none px-2.5 py-1'}
                     onClick={() => onChange && onChange(option)}
                 >
