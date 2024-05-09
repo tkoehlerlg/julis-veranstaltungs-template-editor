@@ -4,24 +4,20 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { SwitchButton } from '@/components/switchButton'
 import { HexColorInput, HexColorPicker } from 'react-colorful'
-import { isColorLight } from '@/lib/color'
+import { isColorLight, ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
 
 const featureColors = [
-    { name: 'Blau', color: '#119EE5' },
-    { name: 'Magenta', color: '#E5017C' },
-    { name: 'Gelb', color: '#FEED00' },
-    { name: 'Weiß', color: '#ffffff' },
+    { name: 'Blau', color: ThemeTemplate.blue },
+    { name: 'Magenta', color: ThemeTemplate.magenta },
+    { name: 'Gelb', color: ThemeTemplate.yellow },
+    { name: 'Weiß', color: ThemeTemplate.white },
 ]
 
-const EditorMode = {
-    background: 'background',
-    headline: 'headline',
-    card: 'card',
-} as const
+type EditorMode = 'headline' | 'card' | 'background'
 
 interface EditorSidebarProps {
-    editorMode: (typeof EditorMode)[keyof typeof EditorMode]
+    editorMode: EditorMode
     title?: string
     onTitleChange?: (title: string) => void
     applyOnSimilar?: boolean
@@ -53,25 +49,24 @@ export function EditorSidebar({
     >(EditorColorPickerAttribute.text)
 
     const showTitle = useMemo(
-        () =>
-            editorMode === EditorMode.headline ||
-            editorMode === EditorMode.card,
+        () => editorMode === 'headline' || editorMode === 'card',
         [editorMode]
     )
 
     const showApplyOnSimilar = useMemo(
-        () => editorMode === EditorMode.card,
+        () => editorMode === 'card',
         [editorMode]
     )
 
     const showAttributeSwitch = useMemo(
-        () =>
-            editorMode === EditorMode.card ||
-            editorMode === EditorMode.headline,
+        () => editorMode === 'card' || editorMode === 'headline',
         [editorMode]
     )
 
     const selectedColor = useMemo(() => {
+        if (editorMode === 'background') {
+            return backgroundColor
+        }
         if (selectedAttribute === EditorColorPickerAttribute.text) {
             return textColor
         } else {
@@ -81,7 +76,7 @@ export function EditorSidebar({
 
     const onColorChange = useCallback(
         (color: string) => {
-            if (editorMode === EditorMode.background) {
+            if (editorMode === 'background') {
                 onBackgroundColorChange?.(color)
                 return
             }
@@ -102,7 +97,7 @@ export function EditorSidebar({
             {showTitle && (
                 <div className='mt-2.5 grid w-full gap-1.5'>
                     <Label htmlFor='text-field'>
-                        {editorMode === EditorMode.card
+                        {editorMode === 'card'
                             ? 'Text in der Kachel'
                             : 'Überschrift'}
                     </Label>

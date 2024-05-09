@@ -13,3 +13,10 @@ export function isColorLight(color: string, treshold = 0.8) {
     }
     return false
 }
+
+export const ThemeTemplate = {
+    blue: '#119EE5',
+    magenta: '#E5017C',
+    yellow: '#FEED00',
+    white: '#ffffff',
+} as const
