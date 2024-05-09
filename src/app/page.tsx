@@ -5,7 +5,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable'
-import { EditorSidebar } from '@/components/EditorSidebar'
+import { EditorSidebar } from '@/components/editorSidebar'
 
 export default function Home() {
     return (
