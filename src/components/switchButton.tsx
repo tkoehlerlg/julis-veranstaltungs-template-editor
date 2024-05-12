@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
 interface SwitchButtonProps {
+    layoutIdExtension?: string
     selected: string
     options: string[]
     onChange?: (selected: string) => void
@@ -9,6 +10,7 @@ interface SwitchButtonProps {
 }
 
 export function SwitchButton({
+    layoutIdExtension,
     selected,
     options,
     onChange,
@@ -32,7 +34,11 @@ export function SwitchButton({
                     {selected === option && (
                         <motion.div
                             layout
-                            layoutId='switch-button-background'
+                            layoutId={
+                                'switch-button-background' + layoutIdExtension
+                                    ? `-${layoutIdExtension}`
+                                    : ''
+                            }
                             className={
                                 'absolute inset-0 h-full w-full rounded bg-[#EEEFF2]'
                             }

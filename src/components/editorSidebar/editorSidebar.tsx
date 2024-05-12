@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
@@ -12,6 +12,7 @@ const defaultCardFeatureColors: FeaturedColor[] = [
     { name: 'Magenta', color: ThemeTemplate.magenta },
     { name: 'Gelb', color: ThemeTemplate.yellow },
     { name: 'Weiß', color: ThemeTemplate.white },
+    { name: 'Schwarz', color: ThemeTemplate.black },
 ]
 
 const defaultBackgroundFeatureColors: FeaturedColor[] = [
@@ -22,6 +23,7 @@ const defaultBackgroundFeatureColors: FeaturedColor[] = [
 type EditorMode = 'title' | 'card' | 'background'
 
 interface EditorSidebarProps {
+    editorId: string
     editorMode: EditorMode
     text?: string
     onTextChange?: (title: string) => void
@@ -41,6 +43,7 @@ const EditorColorPickerAttribute = {
 } as const
 
 export function EditorSidebar({
+    editorId,
     editorMode,
     text,
     onTextChange,
@@ -53,6 +56,7 @@ export function EditorSidebar({
     cardFeaturedColors = [],
     backgroundFeaturedColors = [],
 }: EditorSidebarProps) {
+    const prevEditorIdRef = useRef<string>()
     const [selectedAttribute, setSelectedAttribute] = useState<
         (typeof EditorColorPickerAttribute)[keyof typeof EditorColorPickerAttribute]
     >(EditorColorPickerAttribute.text)
@@ -113,6 +117,13 @@ export function EditorSidebar({
         ]
     )
 
+    useEffect(() => {
+        if (prevEditorIdRef.current !== editorId) {
+            setSelectedAttribute(EditorColorPickerAttribute.text)
+            prevEditorIdRef.current = editorId
+        }
+    }, [editorId])
+
     return (
         <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
             <h2 className={cn('text-xl font-bold', !showTitle && '-mb-5')}>
@@ -151,6 +162,7 @@ export function EditorSidebar({
             )}
             {showAttributeSwitch && (
                 <SwitchButton
+                    layoutIdExtension={editorId}
                     selected={selectedAttribute}
                     options={Object.values(EditorColorPickerAttribute)}
                     onChange={(selected) =>

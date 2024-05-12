@@ -25,7 +25,7 @@ export function EventCardView({
                 onClick?.()
             }}
             className={
-                'relative flex min-h-[44px] w-full cursor-pointer flex-col items-center justify-center'
+                'relative flex min-h-[22px] w-full cursor-pointer flex-col items-center justify-center'
             }
         >
             <div
@@ -43,7 +43,7 @@ export function EventCardView({
             />
             <p
                 className={
-                    'relative cursor-text whitespace-pre-line px-1.5 py-2 text-center font-monserrat text-sm font-black'
+                    'relative cursor-text whitespace-pre-line px-1.5 py-2 text-center font-monserrat text-[10px] font-black'
                 }
                 style={{
                     color: textColor,

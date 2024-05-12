@@ -1,6 +1,5 @@
 export { TemplateBox } from './templateBox'
 export type { EventCard } from './card/eventCard'
 export { EventCardView } from './card/eventCard'
-export type { TitleCard } from './card/titleCard'
-export { TitleCardView } from './card/titleCard'
-export { defaultTitleCard } from './card/titleCard'
+export type { TTitleCard } from './card/titleCard'
+export { TitleCardView, TitleCard } from './card/titleCard'

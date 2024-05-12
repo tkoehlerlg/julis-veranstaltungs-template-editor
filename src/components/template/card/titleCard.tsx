@@ -1,13 +1,13 @@
 import { CardStyles } from './types'
 import { isColorLight, ThemeTemplate } from '@/lib/color'
 
-export type TitleCard = CardStyles & {
+export type TTitleCard = CardStyles & {
     isSelected?: boolean
     title: string
     onClick?: () => void
 }
 
-export const defaultTitleCard: TitleCard = {
+export const TitleCard: TTitleCard = {
     title: 'Test',
     textColor: ThemeTemplate.white,
     backgroundColor: ThemeTemplate.magenta,
@@ -19,7 +19,7 @@ export function TitleCardView({
     textColor,
     backgroundColor,
     onClick,
-}: TitleCard) {
+}: TTitleCard) {
     return (
         <div
             onClick={(e) => {
@@ -28,7 +28,7 @@ export function TitleCardView({
                 onClick?.()
             }}
             className={
-                'relative mb-2 flex min-h-[44px] w-full cursor-pointer flex-col items-center justify-center'
+                'relative flex min-h-[44px] w-full cursor-pointer flex-col items-center justify-center'
             }
         >
             <div

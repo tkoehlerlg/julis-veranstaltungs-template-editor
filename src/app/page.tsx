@@ -8,163 +8,43 @@ import {
 import { EditorSidebar } from '@/components/editorSidebar'
 import {
     TemplateBox,
-    EventCard,
     TitleCardView,
-    TitleCard,
-    defaultTitleCard,
     EventCardView,
 } from '@/components/template'
-import { useCallback, useMemo, useState } from 'react'
-import { ThemeTemplate } from '@/lib/color'
+import { AppContextProvider, useAppContext } from '@/app/appContext'
+import { useMemo } from 'react'
 
-type Selection =
-    | {
-          type: 'background'
-      }
-    | {
-          type: 'title'
-      }
-    | {
-          type: 'card'
-          uuid: string
-      }
-
-export default function Home() {
-    const [selected, setSelected] = useState<Selection>({
-        type: 'background',
-    })
-    const [templateBackgroundColor, setTemplateBackgroundColor] = useState(
-        ThemeTemplate.background as string
+export default function App() {
+    return (
+        <AppContextProvider>
+            <Home />
+        </AppContextProvider>
     )
-    const [titleCard, setTitleCard] = useState<TitleCard>(defaultTitleCard)
-    const [cards, setCards] = useState<EventCard[]>([
-        {
-            uuid: '',
-            title: 'Test Event',
-            textColor: '#000',
-            backgroundColor: '#fff',
-        },
-    ])
+}
 
-    const selectedText = useMemo(() => {
-        switch (selected.type) {
-            case 'title':
-                return titleCard.title
-            case 'card':
-                const card = cards.find((card) => card.uuid === selected.uuid)
-                return card?.title
-        }
-    }, [cards, selected, titleCard.title])
-    const setSelectedText = useCallback(
-        (text: string) => {
-            switch (selected.type) {
-                case 'title':
-                    setTitleCard((prevState) => ({
-                        ...prevState,
-                        title: text,
-                    }))
-                    break
-                case 'card':
-                    setCards((prevState) => {
-                        if (
-                            !prevState.some(
-                                (card) => card.uuid === selected.uuid
-                            )
-                        )
-                            return prevState
-                        return prevState.map((card) =>
-                            card.uuid === selected.uuid
-                                ? { ...card, title: text }
-                                : card
-                        )
-                    })
-            }
-        },
+function Home() {
+    const {
+        selected,
+        setBackgroundSelected,
+        setTitleSelected,
+        setCardSelected,
+        templateBackgroundColor,
+        titleCard,
+        cards,
+        selectedText,
+        selectedTextColor,
+        selectedBackgroundColor,
+        setSelectedText,
+        setSelectedTextColor,
+        setSelectedBackgroundColor,
+    } = useAppContext()
+
+    const editorId = useMemo(
+        () =>
+            selected.type +
+            (selected.type === 'card' ? `-${selected.uuid}` : ''),
         [selected]
     )
-
-    const selectedTextColor = useMemo(() => {
-        switch (selected.type) {
-            case 'title':
-                return titleCard.textColor
-            case 'card':
-                const card = cards.find((card) => card.uuid === selected.uuid)
-                return card?.textColor
-        }
-    }, [cards, selected, titleCard.textColor])
-    const setSelectedTextColor = useCallback(
-        (color: string) => {
-            switch (selected.type) {
-                case 'title':
-                    setTitleCard((prevState) => ({
-                        ...prevState,
-                        textColor: color,
-                    }))
-                    break
-                case 'card':
-                    setCards((prevState) => {
-                        if (
-                            !prevState.some(
-                                (card) => card.uuid === selected.uuid
-                            )
-                        )
-                            return prevState
-                        return prevState.map((card) =>
-                            card.uuid === selected.uuid
-                                ? { ...card, textColor: color }
-                                : card
-                        )
-                    })
-            }
-        },
-        [selected]
-    )
-
-    const selectedBackgroundColor = useMemo(() => {
-        switch (selected.type) {
-            case 'background':
-                return templateBackgroundColor
-            case 'title':
-                return titleCard.backgroundColor
-            case 'card':
-                const card = cards.find((card) => card.uuid === selected.uuid)
-                return card?.backgroundColor
-        }
-    }, [cards, selected, templateBackgroundColor, titleCard.backgroundColor])
-    const setSelectedBackgroundColor = useCallback(
-        (color: string) => {
-            switch (selected.type) {
-                case 'background':
-                    setTemplateBackgroundColor(color)
-                    break
-                case 'title':
-                    setTitleCard((prevState) => ({
-                        ...prevState,
-                        backgroundColor: color,
-                    }))
-                    break
-                case 'card':
-                    setCards((prevState) => {
-                        if (
-                            !prevState.some(
-                                (card) => card.uuid === selected.uuid
-                            )
-                        )
-                            return prevState
-                        return prevState.map((card) =>
-                            card.uuid === selected.uuid
-                                ? { ...card, backgroundColor: color }
-                                : card
-                        )
-                    })
-            }
-        },
-        [selected]
-    )
-
-    const selectBackground = () => setSelected({ type: 'background' })
-    const selectTitleCard = () => setSelected({ type: 'title' })
-    const selectCard = (id: string) => setSelected({ type: 'card', uuid: id })
 
     return (
         <main>
@@ -172,7 +52,7 @@ export default function Home() {
                 <ResizablePanel
                     defaultSize={75}
                     className={'flex h-dvh flex-col pl-10 pt-11'}
-                    onClick={selectBackground}
+                    onClick={setBackgroundSelected}
                 >
                     <h1 className='font-monserrat text-3xl font-black text-magenta'>
                         JuLis Veranstaltungs-Template-Editor
@@ -185,16 +65,29 @@ export default function Home() {
                         <TemplateBox
                             isSelected={selected.type === 'background'}
                             backgroundColor={templateBackgroundColor}
-                            onClick={selectBackground}
+                            onClick={setBackgroundSelected}
+                            className={'scale-125'}
                         >
                             <TitleCardView
                                 {...titleCard}
                                 isSelected={selected.type === 'title'}
-                                onClick={selectTitleCard}
+                                onClick={setTitleSelected}
                             />
-                            {cards.map((card) => (
-                                <EventCardView key={card.uuid} {...card} />
-                            ))}
+                            <div className={'flex flex-col gap-1'}>
+                                {cards.map((card) => (
+                                    <EventCardView
+                                        key={card.uuid}
+                                        {...card}
+                                        isSelected={
+                                            selected.type === 'card' &&
+                                            selected.uuid == card.uuid
+                                        }
+                                        onClick={() =>
+                                            setCardSelected(card.uuid)
+                                        }
+                                    />
+                                ))}
+                            </div>
                         </TemplateBox>
                     </div>
                 </ResizablePanel>
@@ -206,6 +99,7 @@ export default function Home() {
                     className={'border-l'}
                 >
                     <EditorSidebar
+                        editorId={editorId}
                         editorMode={selected.type}
                         text={selectedText}
                         onTextChange={setSelectedText}
