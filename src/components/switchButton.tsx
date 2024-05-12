@@ -34,7 +34,7 @@ export function SwitchButton({
                             layout
                             layoutId='switch-button-background'
                             className={
-                                'absolute inset-0 h-full w-full rounded bg-slate-100'
+                                'absolute inset-0 h-full w-full rounded bg-[#EEEFF2]'
                             }
                         />
                     )}

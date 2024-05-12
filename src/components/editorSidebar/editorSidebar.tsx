@@ -3,29 +3,36 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { SwitchButton } from '@/components/switchButton'
-import { HexColorInput, HexColorPicker } from 'react-colorful'
-import { isColorLight, ThemeTemplate } from '@/lib/color'
+import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
+import { ColorMenu, FeaturedColor } from '@/components/editorSidebar/colorMenu'
 
-const featureColors = [
+const defaultCardFeatureColors: FeaturedColor[] = [
     { name: 'Blau', color: ThemeTemplate.blue },
     { name: 'Magenta', color: ThemeTemplate.magenta },
     { name: 'Gelb', color: ThemeTemplate.yellow },
     { name: 'Weiß', color: ThemeTemplate.white },
 ]
 
-type EditorMode = 'headline' | 'card' | 'background'
+const defaultBackgroundFeatureColors: FeaturedColor[] = [
+    { name: 'D. Grau', color: ThemeTemplate.background },
+    { name: 'Magenta', color: ThemeTemplate.magenta },
+]
+
+type EditorMode = 'title' | 'card' | 'background'
 
 interface EditorSidebarProps {
     editorMode: EditorMode
-    title?: string
-    onTitleChange?: (title: string) => void
+    text?: string
+    onTextChange?: (title: string) => void
     applyOnSimilar?: boolean
     onApplyOnSimilarChange?: (applyOnSimilar: boolean) => void
     textColor?: string
     onTextColorChange?: (color: string) => void
     backgroundColor?: string
     onBackgroundColorChange?: (color: string) => void
+    cardFeaturedColors?: FeaturedColor[]
+    backgroundFeaturedColors?: FeaturedColor[]
 }
 
 const EditorColorPickerAttribute = {
@@ -35,21 +42,23 @@ const EditorColorPickerAttribute = {
 
 export function EditorSidebar({
     editorMode,
-    title,
-    onTitleChange,
+    text,
+    onTextChange,
     applyOnSimilar,
     onApplyOnSimilarChange,
     textColor,
     onTextColorChange,
     backgroundColor,
     onBackgroundColorChange,
+    cardFeaturedColors = [],
+    backgroundFeaturedColors = [],
 }: EditorSidebarProps) {
     const [selectedAttribute, setSelectedAttribute] = useState<
         (typeof EditorColorPickerAttribute)[keyof typeof EditorColorPickerAttribute]
     >(EditorColorPickerAttribute.text)
 
     const showTitle = useMemo(
-        () => editorMode === 'headline' || editorMode === 'card',
+        () => editorMode === 'title' || editorMode === 'card',
         [editorMode]
     )
 
@@ -59,9 +68,19 @@ export function EditorSidebar({
     )
 
     const showAttributeSwitch = useMemo(
-        () => editorMode === 'card' || editorMode === 'headline',
+        () => editorMode === 'card' || editorMode === 'title',
         [editorMode]
     )
+
+    const featureColors = useMemo(() => {
+        if (editorMode === 'card' || editorMode === 'title') {
+            return defaultCardFeatureColors.concat(cardFeaturedColors)
+        } else {
+            return defaultBackgroundFeatureColors.concat(
+                backgroundFeaturedColors
+            )
+        }
+    }, [editorMode, cardFeaturedColors, backgroundFeaturedColors])
 
     const selectedColor = useMemo(() => {
         if (editorMode === 'background') {
@@ -72,7 +91,7 @@ export function EditorSidebar({
         } else {
             return backgroundColor
         }
-    }, [selectedAttribute, textColor, backgroundColor])
+    }, [editorMode, selectedAttribute, backgroundColor, textColor])
 
     const onColorChange = useCallback(
         (color: string) => {
@@ -86,7 +105,12 @@ export function EditorSidebar({
                 onBackgroundColorChange?.(color)
             }
         },
-        [onTextColorChange, onBackgroundColorChange, selectedAttribute]
+        [
+            onTextColorChange,
+            onBackgroundColorChange,
+            selectedAttribute,
+            editorMode,
+        ]
     )
 
     return (
@@ -102,8 +126,8 @@ export function EditorSidebar({
                             : 'Überschrift'}
                     </Label>
                     <Textarea
-                        value={title}
-                        onChange={(e) => onTitleChange?.(e.target.value)}
+                        value={text}
+                        onChange={(e) => onTextChange?.(e.target.value)}
                         placeholder='16. April - JuLis & Friends...'
                         id='text-field'
                         className='resize-none border border-slate-300  focus:ring-slate-300'
@@ -137,56 +161,11 @@ export function EditorSidebar({
                 />
             )}
 
-            <div
-                className={
-                    'color-picker flex flex-col gap-4 rounded-lg border border-slate-200 bg-white pb-2.5'
-                }
-            >
-                <HexColorPicker
-                    color={selectedColor}
-                    onChange={onColorChange}
-                />
-                <div
-                    className={
-                        'flex flex-row items-baseline gap-1.5 px-2.5 text-sm font-medium'
-                    }
-                >
-                    <p>HEX:</p>
-                    <HexColorInput
-                        color={selectedColor}
-                        onChange={onColorChange}
-                        className={
-                            'w-20 rounded-lg bg-slate-100 px-2.5 py-1 text-sm focus:outline-0'
-                        }
-                    />
-                </div>
-                <div className={'flex flex-row gap-1.5 px-2.5'}>
-                    {featureColors.map((color) => (
-                        <div
-                            key={color.name}
-                            className={
-                                'flex flex-1 cursor-pointer flex-col items-start gap-1'
-                            }
-                            onClick={() => onColorChange(color.color)}
-                        >
-                            <div
-                                className={`h-11 w-full rounded-lg shadow`}
-                                style={{ backgroundColor: color.color }}
-                            />
-                            <p
-                                className={'text-[12px]'}
-                                style={{
-                                    color: isColorLight(color.color, 0.85)
-                                        ? 'black'
-                                        : color.color,
-                                }}
-                            >
-                                {color.name}
-                            </p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <ColorMenu
+                selectedColor={selectedColor ?? '#fff'}
+                onColorChange={onColorChange}
+                featuredColors={featureColors}
+            />
         </div>
     )
 }

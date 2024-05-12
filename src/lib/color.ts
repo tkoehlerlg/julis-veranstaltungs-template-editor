@@ -19,4 +19,5 @@ export const ThemeTemplate = {
     magenta: '#E5017C',
     yellow: '#FEED00',
     white: '#ffffff',
+    background: '#1E1F21',
 } as const
