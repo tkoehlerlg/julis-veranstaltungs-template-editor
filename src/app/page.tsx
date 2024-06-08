@@ -11,7 +11,10 @@ import {
     TitleCardView,
     EventCardView,
 } from '@/components/editor/template'
-import { EditorContextProvider, useEditorContext } from '@/app/appContext'
+import {
+    EditorContextProvider,
+    useEditorContext,
+} from '@/contexts/editorContext'
 import { useMemo } from 'react'
 import { Plus } from 'lucide-react'
 
