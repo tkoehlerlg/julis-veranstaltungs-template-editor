@@ -6,7 +6,7 @@ import { SwitchButton } from '@/components/ui/switchButton'
 import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
 import { ColorMenu, FeaturedColor } from '@/components/editor/sidebar/colorMenu'
-import { useEditorContext } from '@/app/appContext'
+import { useEditorContext } from '@/contexts/editorContext'
 
 const defaultCardFeatureColors: FeaturedColor[] = [
     { name: 'Blau', color: ThemeTemplate.blue },
