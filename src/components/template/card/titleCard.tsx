@@ -28,7 +28,7 @@ export function TitleCardView({
                 onClick?.()
             }}
             className={
-                'relative flex min-h-[44px] w-full cursor-pointer flex-col items-center justify-center'
+                'relative flex min-h-[42px] w-full cursor-pointer flex-col items-center justify-center'
             }
         >
             <div
@@ -46,7 +46,7 @@ export function TitleCardView({
             />
             <p
                 className={
-                    'relative cursor-text whitespace-pre-line px-2 py-2 text-center font-monserrat text-lg font-black'
+                    'relative cursor-text whitespace-pre-wrap px-2 py-1.5 text-center font-monserrat text-lg font-black'
                 }
                 style={{
                     color: textColor,

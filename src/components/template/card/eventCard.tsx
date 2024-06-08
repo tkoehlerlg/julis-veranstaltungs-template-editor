@@ -43,7 +43,7 @@ export function EventCardView({
             />
             <p
                 className={
-                    'relative cursor-text whitespace-pre-line px-1.5 py-2 text-center font-monserrat text-[10px] font-black'
+                    'relative cursor-text whitespace-pre-line px-2 py-1 text-center font-monserrat text-[10px] font-black'
                 }
                 style={{
                     color: textColor,
