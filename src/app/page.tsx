@@ -5,12 +5,12 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable'
-import { EditorSidebar } from '@/components/editorSidebar'
+import { EditorSidebar } from '@/components/editor/sidebar'
 import {
     TemplateBox,
     TitleCardView,
     EventCardView,
-} from '@/components/template'
+} from '@/components/editor/template'
 import { EditorContextProvider, useEditorContext } from '@/app/appContext'
 import { useMemo } from 'react'
 import { Plus } from 'lucide-react'

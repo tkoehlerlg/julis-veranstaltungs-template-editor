@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
-import { SwitchButton } from '@/components/switchButton'
+import { SwitchButton } from '@/components/ui/switchButton'
 import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
-import { ColorMenu, FeaturedColor } from '@/components/editorSidebar/colorMenu'
+import { ColorMenu, FeaturedColor } from '@/components/editor/sidebar/colorMenu'
 import { useEditorContext } from '@/app/appContext'
 
 const defaultCardFeatureColors: FeaturedColor[] = [

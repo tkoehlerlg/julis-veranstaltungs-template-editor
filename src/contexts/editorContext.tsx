@@ -7,7 +7,7 @@ import {
     useState,
 } from 'react'
 import { ThemeTemplate } from '@/lib/color'
-import { TitleCard, EventCard, TTitleCard } from '@/components/template'
+import { TitleCard, EventCard, TTitleCard } from '../components/editor/template'
 
 type Selection =
     | {
