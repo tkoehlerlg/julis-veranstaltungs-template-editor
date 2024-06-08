@@ -21,11 +21,14 @@ type Selection =
           uuid: string
       }
 
-interface IAppContet {
-    selected: Selection
-    setBackgroundSelected: () => void
-    setTitleSelected: () => void
-    setCardSelected: (uuid: string) => void
+interface IEditorContent {
+    selected?: Selection
+    setSelected: (
+        selection:
+            | Selection
+            | undefined
+            | ((prev: Selection | undefined) => Selection | undefined)
+    ) => void
     templateBackgroundColor: string
     titleCard: TTitleCard
     cards: EventCard[]
@@ -40,11 +43,9 @@ interface IAppContet {
 const didNotInitAlert = () => {
     console.log('You did not initiate AppContext')
 }
-const AppContext = createContext<IAppContet>({
-    selected: { type: 'background' },
-    setBackgroundSelected: () => didNotInitAlert,
-    setTitleSelected: () => didNotInitAlert,
-    setCardSelected: (uuid: string) => didNotInitAlert,
+const EditorContext = createContext<IEditorContent>({
+    selected: undefined,
+    setSelected: didNotInitAlert,
     templateBackgroundColor: ThemeTemplate.background,
     titleCard: TitleCard,
     cards: [],
@@ -56,12 +57,10 @@ const AppContext = createContext<IAppContet>({
     setSelectedBackgroundColor: (color: string) => didNotInitAlert,
 })
 
-export const useAppContext = () => useContext(AppContext)
+export const useEditorContext = () => useContext(EditorContext)
 
-export function AppContextProvider({ children }: { children: ReactNode }) {
-    const [selected, setSelected] = useState<Selection>({
-        type: 'background',
-    })
+export function EditorContextProvider({ children }: { children: ReactNode }) {
+    const [selected, setSelected] = useState<Selection | undefined>(undefined)
     const [templateBackgroundColor, setTemplateBackgroundColor] = useState(
         ThemeTemplate.background as string
     )
@@ -73,10 +72,16 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
             textColor: ThemeTemplate.yellow,
             backgroundColor: ThemeTemplate.magenta,
         },
+        {
+            uuid: '001',
+            title: 'Test Event 2',
+            textColor: ThemeTemplate.yellow,
+            backgroundColor: ThemeTemplate.magenta,
+        },
     ])
 
     const selectedText = useMemo(() => {
-        switch (selected.type) {
+        switch (selected?.type) {
             case 'title':
                 return titleCard.title
             case 'card':
@@ -86,7 +91,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }, [cards, selected, titleCard.title])
     const setSelectedText = useCallback(
         (text: string) => {
-            switch (selected.type) {
+            switch (selected?.type) {
                 case 'title':
                     setTitleCard((prevState) => ({
                         ...prevState,
@@ -113,7 +118,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     )
 
     const selectedTextColor = useMemo(() => {
-        switch (selected.type) {
+        switch (selected?.type) {
             case 'title':
                 return titleCard.textColor
             case 'card':
@@ -123,7 +128,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }, [cards, selected, titleCard.textColor])
     const setSelectedTextColor = useCallback(
         (color: string) => {
-            switch (selected.type) {
+            switch (selected?.type) {
                 case 'title':
                     setTitleCard((prevState) => ({
                         ...prevState,
@@ -150,7 +155,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     )
 
     const selectedBackgroundColor = useMemo(() => {
-        switch (selected.type) {
+        switch (selected?.type) {
             case 'background':
                 return templateBackgroundColor
             case 'title':
@@ -162,7 +167,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }, [cards, selected, templateBackgroundColor, titleCard.backgroundColor])
     const setSelectedBackgroundColor = useCallback(
         (color: string) => {
-            switch (selected.type) {
+            switch (selected?.type) {
                 case 'background':
                     setTemplateBackgroundColor(color)
                     break
@@ -191,18 +196,11 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
         [selected]
     )
 
-    const setBackgroundSelected = () => setSelected({ type: 'background' })
-    const setTitleSelected = () => setSelected({ type: 'title' })
-    const setCardSelected = (uuid: string) =>
-        setSelected({ type: 'card', uuid })
-
     return (
-        <AppContext.Provider
+        <EditorContext.Provider
             value={{
                 selected,
-                setBackgroundSelected,
-                setTitleSelected,
-                setCardSelected,
+                setSelected,
                 templateBackgroundColor,
                 titleCard,
                 cards,
@@ -215,6 +213,6 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
             }}
         >
             {children}
-        </AppContext.Provider>
+        </EditorContext.Provider>
     )
 }

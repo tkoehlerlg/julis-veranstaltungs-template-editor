@@ -6,6 +6,7 @@ import { SwitchButton } from '@/components/switchButton'
 import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
 import { ColorMenu, FeaturedColor } from '@/components/editorSidebar/colorMenu'
+import { useEditorContext } from '@/app/appContext'
 
 const defaultCardFeatureColors: FeaturedColor[] = [
     { name: 'Blau', color: ThemeTemplate.blue },
@@ -20,57 +21,43 @@ const defaultBackgroundFeatureColors: FeaturedColor[] = [
     { name: 'Magenta', color: ThemeTemplate.magenta },
 ]
 
-type EditorMode = 'title' | 'card' | 'background'
-
-interface EditorSidebarProps {
-    editorId: string
-    editorMode: EditorMode
-    text?: string
-    onTextChange?: (title: string) => void
-    applyOnSimilar?: boolean
-    onApplyOnSimilarChange?: (applyOnSimilar: boolean) => void
-    textColor?: string
-    onTextColorChange?: (color: string) => void
-    backgroundColor?: string
-    onBackgroundColorChange?: (color: string) => void
-    cardFeaturedColors?: FeaturedColor[]
-    backgroundFeaturedColors?: FeaturedColor[]
-}
-
-const EditorColorPickerAttribute = {
+const EditorCPAttribute = {
     text: 'Text',
     background: 'Background',
 } as const
 
-export function EditorSidebar({
-    editorId,
-    editorMode,
-    text,
-    onTextChange,
-    applyOnSimilar,
-    onApplyOnSimilarChange,
-    textColor,
-    onTextColorChange,
-    backgroundColor,
-    onBackgroundColorChange,
-    cardFeaturedColors = [],
-    backgroundFeaturedColors = [],
-}: EditorSidebarProps) {
+export function EditorSidebar() {
     const prevEditorIdRef = useRef<string>()
     const [selectedAttribute, setSelectedAttribute] = useState<
-        (typeof EditorColorPickerAttribute)[keyof typeof EditorColorPickerAttribute]
-    >(EditorColorPickerAttribute.text)
+        (typeof EditorCPAttribute)[keyof typeof EditorCPAttribute]
+    >(EditorCPAttribute.text)
+
+    const {
+        selected,
+        selectedText,
+        setSelectedText,
+        selectedBackgroundColor,
+        setSelectedBackgroundColor,
+        selectedTextColor,
+        setSelectedTextColor,
+    } = useEditorContext()
+
+    const editorMode = useMemo(() => selected?.type, [selected])
+    const editorId = useMemo(
+        () =>
+            selected?.type +
+            (selected?.type === 'card' ? `-${selected.uuid}` : ''),
+        [selected]
+    )
 
     const showTitle = useMemo(
         () => editorMode === 'title' || editorMode === 'card',
         [editorMode]
     )
-
     const showApplyOnSimilar = useMemo(
         () => editorMode === 'card',
         [editorMode]
     )
-
     const showAttributeSwitch = useMemo(
         () => editorMode === 'card' || editorMode === 'title',
         [editorMode]
@@ -78,40 +65,41 @@ export function EditorSidebar({
 
     const featureColors = useMemo(() => {
         if (editorMode === 'card' || editorMode === 'title') {
-            return defaultCardFeatureColors.concat(cardFeaturedColors)
+            return defaultCardFeatureColors
         } else {
-            return defaultBackgroundFeatureColors.concat(
-                backgroundFeaturedColors
-            )
+            return defaultBackgroundFeatureColors
         }
-    }, [editorMode, cardFeaturedColors, backgroundFeaturedColors])
+    }, [editorMode])
 
     const selectedColor = useMemo(() => {
-        if (editorMode === 'background') {
-            return backgroundColor
+        if (
+            editorMode !== 'background' &&
+            selectedAttribute === EditorCPAttribute.text
+        ) {
+            return selectedTextColor
         }
-        if (selectedAttribute === EditorColorPickerAttribute.text) {
-            return textColor
-        } else {
-            return backgroundColor
-        }
-    }, [editorMode, selectedAttribute, backgroundColor, textColor])
+        return selectedBackgroundColor
+    }, [
+        editorMode,
+        selectedAttribute,
+        selectedBackgroundColor,
+        selectedTextColor,
+    ])
 
     const onColorChange = useCallback(
         (color: string) => {
-            if (editorMode === 'background') {
-                onBackgroundColorChange?.(color)
-                return
-            }
-            if (selectedAttribute === EditorColorPickerAttribute.text) {
-                onTextColorChange?.(color)
+            if (
+                editorMode !== 'background' &&
+                selectedAttribute === EditorCPAttribute.text
+            ) {
+                setSelectedTextColor(color)
             } else {
-                onBackgroundColorChange?.(color)
+                setSelectedBackgroundColor(color)
             }
         },
         [
-            onTextColorChange,
-            onBackgroundColorChange,
+            setSelectedTextColor,
+            setSelectedBackgroundColor,
             selectedAttribute,
             editorMode,
         ]
@@ -119,7 +107,7 @@ export function EditorSidebar({
 
     useEffect(() => {
         if (prevEditorIdRef.current !== editorId) {
-            setSelectedAttribute(EditorColorPickerAttribute.text)
+            setSelectedAttribute(EditorCPAttribute.text)
             prevEditorIdRef.current = editorId
         }
     }, [editorId])
@@ -137,8 +125,8 @@ export function EditorSidebar({
                             : 'Überschrift'}
                     </Label>
                     <Textarea
-                        value={text}
-                        onChange={(e) => onTextChange?.(e.target.value)}
+                        value={selectedText}
+                        onChange={(e) => setSelectedText(e.target.value)}
                         placeholder='16. April - JuLis & Friends...'
                         id='text-field'
                         className='resize-none border border-slate-300  focus:ring-slate-300'
@@ -148,23 +136,23 @@ export function EditorSidebar({
             <h3 className='mt-4 text-lg font-semibold text-gray-600'>
                 {!showAttributeSwitch ? 'Hintergrundfarbe' : 'Styles'}
             </h3>
-            {showApplyOnSimilar && (
-                <div className='flex items-center space-x-2'>
-                    <Switch
-                        id='apply-on-similar'
-                        checked={applyOnSimilar}
-                        onCheckedChange={onApplyOnSimilarChange}
-                    />
-                    <Label htmlFor='apply-on-similar'>
-                        Auf gleichfarbige anwenden
-                    </Label>
-                </div>
-            )}
+            {/*{showApplyOnSimilar && (*/}
+            {/*    <div className='flex items-center space-x-2'>*/}
+            {/*        <Switch*/}
+            {/*            id='apply-on-similar'*/}
+            {/*            checked={applyOnSimilar}*/}
+            {/*            onCheckedChange={onApplyOnSimilarChange}*/}
+            {/*        />*/}
+            {/*        <Label htmlFor='apply-on-similar'>*/}
+            {/*            Auf gleichfarbige anwenden*/}
+            {/*        </Label>*/}
+            {/*    </div>*/}
+            {/*)}*/}
             {showAttributeSwitch && (
                 <SwitchButton
                     layoutIdExtension={editorId}
                     selected={selectedAttribute}
-                    options={Object.values(EditorColorPickerAttribute)}
+                    options={Object.values(EditorCPAttribute)}
                     onChange={(selected) =>
                         setSelectedAttribute(
                             selected as typeof selectedAttribute

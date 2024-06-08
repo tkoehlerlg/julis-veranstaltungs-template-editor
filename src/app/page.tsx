@@ -11,40 +11,21 @@ import {
     TitleCardView,
     EventCardView,
 } from '@/components/template'
-import { AppContextProvider, useAppContext } from '@/app/appContext'
+import { EditorContextProvider, useEditorContext } from '@/app/appContext'
 import { useMemo } from 'react'
+import { Plus } from 'lucide-react'
 
 export default function App() {
     return (
-        <AppContextProvider>
+        <EditorContextProvider>
             <Home />
-        </AppContextProvider>
+        </EditorContextProvider>
     )
 }
 
 function Home() {
-    const {
-        selected,
-        setBackgroundSelected,
-        setTitleSelected,
-        setCardSelected,
-        templateBackgroundColor,
-        titleCard,
-        cards,
-        selectedText,
-        selectedTextColor,
-        selectedBackgroundColor,
-        setSelectedText,
-        setSelectedTextColor,
-        setSelectedBackgroundColor,
-    } = useAppContext()
-
-    const editorId = useMemo(
-        () =>
-            selected.type +
-            (selected.type === 'card' ? `-${selected.uuid}` : ''),
-        [selected]
-    )
+    const { selected, setSelected, templateBackgroundColor, titleCard, cards } =
+        useEditorContext()
 
     return (
         <main>
@@ -52,7 +33,7 @@ function Home() {
                 <ResizablePanel
                     defaultSize={75}
                     className={'flex h-dvh flex-col pl-10 pt-11'}
-                    onClick={setBackgroundSelected}
+                    onClick={() => setSelected(undefined)}
                 >
                     <h1 className='font-monserrat text-3xl font-black text-magenta'>
                         JuLis Veranstaltungs-Template-Editor
@@ -63,29 +44,42 @@ function Home() {
                         }
                     >
                         <TemplateBox
-                            isSelected={selected.type === 'background'}
+                            isSelected={selected?.type === 'background'}
                             backgroundColor={templateBackgroundColor}
-                            onClick={setBackgroundSelected}
+                            onClick={() => setSelected({ type: 'background' })}
                             className={'scale-125'}
                         >
                             <TitleCardView
                                 {...titleCard}
-                                isSelected={selected.type === 'title'}
-                                onClick={setTitleSelected}
+                                isSelected={selected?.type === 'title'}
+                                onClick={() => setSelected({ type: 'title' })}
                             />
-                            <div className={'flex flex-col gap-1'}>
-                                {cards.map((card) => (
-                                    <EventCardView
-                                        key={card.uuid}
-                                        {...card}
-                                        isSelected={
-                                            selected.type === 'card' &&
-                                            selected.uuid == card.uuid
-                                        }
-                                        onClick={() =>
-                                            setCardSelected(card.uuid)
-                                        }
-                                    />
+                            <AddButton />
+                            <div className={'relative flex flex-col gap-1'}>
+                                {cards.map((card, index) => (
+                                    <div key={card.uuid}>
+                                        <EventCardView
+                                            {...card}
+                                            isSelected={
+                                                selected?.type === 'card' &&
+                                                selected.uuid == card.uuid
+                                            }
+                                            onClick={() =>
+                                                setSelected({
+                                                    type: 'card',
+                                                    uuid: card.uuid,
+                                                })
+                                            }
+                                        />
+                                        <AddButton
+                                            paddingTop={6.5}
+                                            paddingBottom={
+                                                index === cards.length - 1
+                                                    ? 0
+                                                    : 2.5
+                                            }
+                                        />
+                                    </div>
                                 ))}
                             </div>
                         </TemplateBox>
@@ -98,18 +92,48 @@ function Home() {
                     defaultSize={25}
                     className={'border-l'}
                 >
-                    <EditorSidebar
-                        editorId={editorId}
-                        editorMode={selected.type}
-                        text={selectedText}
-                        onTextChange={setSelectedText}
-                        textColor={selectedTextColor}
-                        onTextColorChange={setSelectedTextColor}
-                        backgroundColor={selectedBackgroundColor}
-                        onBackgroundColorChange={setSelectedBackgroundColor}
-                    />
+                    <EditorSidebar />
                 </ResizablePanel>
             </ResizablePanelGroup>
         </main>
     )
 }
+
+const AddButton = ({
+    onTap,
+    paddingTop = 0,
+    paddingBottom = 0,
+}: {
+    onTap?: () => void
+    paddingTop?: number
+    paddingBottom?: number
+}) => (
+    <div
+        className={
+            'relative z-50 -my-1 flex h-0 w-full cursor-pointer flex-row items-center px-5 opacity-0 transition-opacity duration-200  hover:opacity-100'
+        }
+        style={{ paddingTop, paddingBottom }}
+        onClick={(e) => {
+            e.stopPropagation()
+            onTap?.()
+        }}
+    >
+        <div
+            className={
+                'box-content h-[1.5px] w-full rounded-l-md border-[0.5px] border-r-0 border-black bg-white'
+            }
+        />
+        <div
+            className={
+                'flex h-3.5 min-w-3.5 items-center justify-center rounded-md border-[0.5px] border-black bg-white'
+            }
+        >
+            <Plus size={10} strokeWidth={2.5} color={'black'} />
+        </div>
+        <div
+            className={
+                'box-content h-[1.5px] w-full rounded-r-md border-[0.5px] border-l-0 border-black bg-white'
+            }
+        />
+    </div>
+)
