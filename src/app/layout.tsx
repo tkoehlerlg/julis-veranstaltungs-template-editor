@@ -10,7 +10,7 @@ const montserrat = Montserrat({
 })
 
 export const metadata: Metadata = {
-    title: 'JuLis - Veranstaltungs-Template',
+    title: 'JuLis - Veranstaltungs-Template-Editor',
     description:
         'Erstelle schenll und einfach Übersichten für deine nächsten Veranstaltungen',
 }
