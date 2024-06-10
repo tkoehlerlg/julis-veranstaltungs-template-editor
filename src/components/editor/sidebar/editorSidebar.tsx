@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
 import { SwitchButton } from '@/components/ui/switchButton'
 import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
@@ -112,10 +111,10 @@ export function EditorSidebar() {
         }
     }, [editorId])
 
-    return (
+    return selected ? (
         <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
             <h2 className={cn('text-xl font-bold', !showTitle && '-mb-5')}>
-                Editor
+                Edit Sidebar
             </h2>
             {showTitle && (
                 <div className='mt-2.5 grid w-full gap-1.5'>
@@ -166,6 +165,15 @@ export function EditorSidebar() {
                 onColorChange={onColorChange}
                 featuredColors={featureColors}
             />
+        </div>
+    ) : (
+        <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
+            <h2 className={cn('text-xl font-bold', !showTitle && '-mb-5')}>
+                Bearbeitungsleiste
+            </h2>
+            <p className='mt-5 grid w-full gap-1.5 text-xs text-gray-400'>
+                Bitte wähle etwas aus um es hier zu bearbeiten.
+            </p>
         </div>
     )
 }
