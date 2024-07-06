@@ -1,11 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+    Fragment,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { SwitchButton } from '@/components/ui/switchButton'
 import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
 import { ColorMenu, FeaturedColor } from '@/components/editor/sidebar/colorMenu'
-import { useEditorContext } from '@/contexts/editorContext'
+import { useTemplateEditorContext } from '@/contexts/templateEditor/templateEditorContext'
 
 const defaultCardFeatureColors: FeaturedColor[] = [
     { name: 'Blau', color: ThemeTemplate.blue },
@@ -20,6 +27,7 @@ const defaultBackgroundFeatureColors: FeaturedColor[] = [
     { name: 'Magenta', color: ThemeTemplate.magenta },
 ]
 
+// EditorColorPickerAttribute
 const EditorCPAttribute = {
     text: 'Text',
     background: 'Background',
@@ -27,21 +35,30 @@ const EditorCPAttribute = {
 
 export function EditorSidebar() {
     const prevEditorIdRef = useRef<string>()
-    const [selectedAttribute, setSelectedAttribute] = useState<
+    const [selectedCPAttribute, setSelectedCPAttribute] = useState<
         (typeof EditorCPAttribute)[keyof typeof EditorCPAttribute]
     >(EditorCPAttribute.text)
 
     const {
         selected,
-        selectedText,
-        setSelectedText,
-        selectedBackgroundColor,
-        setSelectedBackgroundColor,
-        selectedTextColor,
-        setSelectedTextColor,
-    } = useEditorContext()
+        templateBackgroundColor,
+        updateTemplateBackgroundColor,
+        titleCard,
+        updateTitleCard,
+        cards,
+        updateCard,
+        deleteCard,
+    } = useTemplateEditorContext()
 
-    const editorMode = useMemo(() => selected?.type, [selected])
+    const selectedType = useMemo(() => selected?.type, [selected])
+    const selectedCard = useMemo(
+        () =>
+            selected?.type === 'card'
+                ? cards.find((card) => card.uuid === selected?.uuid)
+                : undefined,
+        [selected, cards]
+    )
+
     const editorId = useMemo(
         () =>
             selected?.type +
@@ -49,77 +66,114 @@ export function EditorSidebar() {
         [selected]
     )
 
-    const showTitle = useMemo(
-        () => editorMode === 'title' || editorMode === 'card',
-        [editorMode]
-    )
-    const showApplyOnSimilar = useMemo(
-        () => editorMode === 'card',
-        [editorMode]
-    )
-    const showAttributeSwitch = useMemo(
-        () => editorMode === 'card' || editorMode === 'title',
-        [editorMode]
-    )
-
-    const featureColors = useMemo(() => {
-        if (editorMode === 'card' || editorMode === 'title') {
-            return defaultCardFeatureColors
-        } else {
-            return defaultBackgroundFeatureColors
+    const selectedText = useMemo(() => {
+        switch (selectedType) {
+            case 'title':
+                return titleCard.title
+            case 'card':
+                return selectedCard?.title
         }
-    }, [editorMode])
+    }, [selectedType, titleCard.title, selectedCard?.title])
+
+    const setSelectedText = useCallback(
+        (text: string) => {
+            if (selected) {
+                switch (selected.type) {
+                    case 'title':
+                        return updateTitleCard({ title: text })
+                    case 'card':
+                        return updateCard(selected.uuid, { title: text })
+                }
+            }
+        },
+        [selected, updateTitleCard, updateCard]
+    )
 
     const selectedColor = useMemo(() => {
         if (
-            editorMode !== 'background' &&
-            selectedAttribute === EditorCPAttribute.text
+            selectedType !== 'background' &&
+            selectedCPAttribute === EditorCPAttribute.text
         ) {
-            return selectedTextColor
+            switch (selectedType) {
+                case 'title':
+                    return titleCard.textColor
+                case 'card':
+                    return selectedCard?.textColor
+            }
         }
-        return selectedBackgroundColor
+        switch (selectedType) {
+            case 'background':
+                return templateBackgroundColor
+            case 'title':
+                return titleCard.backgroundColor
+            case 'card':
+                return selectedCard?.backgroundColor
+        }
     }, [
-        editorMode,
-        selectedAttribute,
-        selectedBackgroundColor,
-        selectedTextColor,
+        selectedType,
+        selectedCPAttribute,
+        selectedCard?.backgroundColor,
+        selectedCard?.textColor,
+        templateBackgroundColor,
+        titleCard.backgroundColor,
+        titleCard.textColor,
     ])
 
-    const onColorChange = useCallback(
+    const onSelectedColorChange = useCallback(
         (color: string) => {
+            if (!selected) return
             if (
-                editorMode !== 'background' &&
-                selectedAttribute === EditorCPAttribute.text
+                selectedType !== 'background' &&
+                selectedCPAttribute === EditorCPAttribute.text
             ) {
-                setSelectedTextColor(color)
-            } else {
-                setSelectedBackgroundColor(color)
+                switch (selected.type) {
+                    case 'title':
+                        return updateTitleCard({ textColor: color })
+                    case 'card':
+                        return updateCard(selected.uuid, { textColor: color })
+                }
+            }
+            switch (selected.type) {
+                case 'background':
+                    return updateTemplateBackgroundColor(color)
+                case 'title':
+                    return updateTitleCard({ backgroundColor: color })
+                case 'card':
+                    return updateCard(selected.uuid, { backgroundColor: color })
             }
         },
         [
-            setSelectedTextColor,
-            setSelectedBackgroundColor,
-            selectedAttribute,
-            editorMode,
+            selected,
+            selectedType,
+            selectedCPAttribute,
+            updateTitleCard,
+            updateCard,
+            updateTemplateBackgroundColor,
         ]
     )
 
+    // Reset selected attribute when switching between selected elements
     useEffect(() => {
         if (prevEditorIdRef.current !== editorId) {
-            setSelectedAttribute(EditorCPAttribute.text)
+            setSelectedCPAttribute(EditorCPAttribute.text)
             prevEditorIdRef.current = editorId
         }
     }, [editorId])
 
     return selected ? (
         <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
-            <h2 className={cn('text-xl font-bold', !showTitle && '-mb-5')}>
+            <h2
+                className={cn(
+                    'text-xl font-bold',
+                    selectedType !== 'background' && '-mb-5'
+                )}
+            >
                 Edit Sidebar
             </h2>
-            {showTitle && (
+            {selectedType !== 'background' && (
                 <div className='mt-2.5 grid w-full gap-1.5'>
                     <Label htmlFor='text-field'>
-                        {editorMode === 'card'
+                        {selectedType === 'card'
                             ? 'Text in der Kachel'
                             : 'Überschrift'}
                     </Label>
@@ -133,7 +187,7 @@ export function EditorSidebar() {
                 </div>
             )}
             <h3 className='mt-4 text-lg font-semibold text-gray-600'>
-                {!showAttributeSwitch ? 'Hintergrundfarbe' : 'Styles'}
+                {selectedType === 'background' ? 'Hintergrundfarbe' : 'Styles'}
             </h3>
             {/*{showApplyOnSimilar && (*/}
             {/*    <div className='flex items-center space-x-2'>*/}
@@ -147,14 +201,14 @@ export function EditorSidebar() {
             {/*        </Label>*/}
             {/*    </div>*/}
             {/*)}*/}
-            {showAttributeSwitch && (
+            {selectedType !== 'background' && (
                 <SwitchButton
                     layoutIdExtension={editorId}
-                    selected={selectedAttribute}
+                    selected={selectedCPAttribute}
                     options={Object.values(EditorCPAttribute)}
                     onChange={(selected) =>
-                        setSelectedAttribute(
-                            selected as typeof selectedAttribute
+                        setSelectedCPAttribute(
+                            selected as typeof selectedCPAttribute
                         )
                     }
                 />
@@ -162,15 +216,31 @@ export function EditorSidebar() {
 
             <ColorMenu
                 selectedColor={selectedColor ?? '#fff'}
-                onColorChange={onColorChange}
-                featuredColors={featureColors}
+                onColorChange={onSelectedColorChange}
+                featuredColors={
+                    selectedType === 'background'
+                        ? defaultBackgroundFeatureColors
+                        : defaultCardFeatureColors
+                }
             />
+
+            {selected?.type === 'card' && (
+                <Fragment>
+                    <h3 className='mt-4 text-lg font-semibold text-gray-600'>
+                        Aktionen
+                    </h3>
+                    <button
+                        onClick={() => deleteCard(selected.uuid)}
+                        className='rounded-md border-2 border-red-500 bg-white px-4 py-2 font-semibold text-red-500'
+                    >
+                        Delete
+                    </button>
+                </Fragment>
+            )}
         </div>
     ) : (
         <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
-            <h2 className={cn('text-xl font-bold', !showTitle && '-mb-5')}>
-                Bearbeitungsleiste
-            </h2>
+            <h2 className={'text-xl font-bold'}>Bearbeitungsleiste</h2>
             <p className='mt-5 grid w-full gap-1.5 text-xs text-gray-400'>
                 Bitte wähle etwas aus um es hier zu bearbeiten.
             </p>

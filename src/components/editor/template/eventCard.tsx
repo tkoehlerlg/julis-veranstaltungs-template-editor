@@ -1,4 +1,4 @@
-import { CardStyles } from '@/components/editor/template/card/types'
+import { CardStyles } from '@/components/editor/template/types'
 import { isColorLight } from '@/lib/color'
 
 export type EventCard = CardStyles & {

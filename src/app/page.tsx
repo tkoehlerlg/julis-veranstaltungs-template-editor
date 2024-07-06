@@ -7,28 +7,31 @@ import {
 } from '@/components/ui/resizable'
 import { EditorSidebar } from '@/components/editor/sidebar'
 import {
-    TemplateBox,
-    TitleCardView,
-    EventCardView,
-} from '@/components/editor/template'
-import {
-    EditorContextProvider,
-    useEditorContext,
-} from '@/contexts/editorContext'
-import { useMemo } from 'react'
-import { Plus } from 'lucide-react'
+    TemplateEditorContextProvider,
+    useTemplateEditorContext,
+} from '@/contexts/templateEditor/templateEditorContext'
+import { AddButton } from '@/components/editor/template/addButton'
+import { EventCardView } from '@/components/editor/template/eventCard'
+import { TemplateBox } from '@/components/editor/template/templateBox'
+import { TitleCard } from '@/components/editor/template/titleCard'
 
 export default function App() {
     return (
-        <EditorContextProvider>
-            <Home />
-        </EditorContextProvider>
+        <TemplateEditorContextProvider>
+            <TemplateEditor />
+        </TemplateEditorContextProvider>
     )
 }
 
-function Home() {
-    const { selected, setSelected, templateBackgroundColor, titleCard, cards } =
-        useEditorContext()
+function TemplateEditor() {
+    const {
+        selected,
+        setSelected,
+        templateBackgroundColor,
+        titleCard,
+        cards,
+        addCard,
+    } = useTemplateEditorContext()
 
     return (
         <main>
@@ -52,12 +55,8 @@ function Home() {
                             onClick={() => setSelected({ type: 'background' })}
                             className={'scale-125'}
                         >
-                            <TitleCardView
-                                {...titleCard}
-                                isSelected={selected?.type === 'title'}
-                                onClick={() => setSelected({ type: 'title' })}
-                            />
-                            <AddButton />
+                            <TitleCard />
+                            <AddButton onClick={() => addCard(0)} />
                             <div className={'relative flex flex-col gap-1'}>
                                 {cards.map((card, index) => (
                                     <div key={card.uuid}>
@@ -81,6 +80,7 @@ function Home() {
                                                     ? 0
                                                     : 2.5
                                             }
+                                            onClick={() => addCard(index + 1)}
                                         />
                                     </div>
                                 ))}
@@ -101,42 +101,3 @@ function Home() {
         </main>
     )
 }
-
-const AddButton = ({
-    onTap,
-    paddingTop = 0,
-    paddingBottom = 0,
-}: {
-    onTap?: () => void
-    paddingTop?: number
-    paddingBottom?: number
-}) => (
-    <div
-        className={
-            'relative z-50 -my-1 flex h-0 w-full cursor-pointer flex-row items-center px-5 opacity-0 transition-opacity duration-200  hover:opacity-100'
-        }
-        style={{ paddingTop, paddingBottom }}
-        onClick={(e) => {
-            e.stopPropagation()
-            onTap?.()
-        }}
-    >
-        <div
-            className={
-                'box-content h-[1.5px] w-full rounded-l-md border-[0.5px] border-r-0 border-black bg-white'
-            }
-        />
-        <div
-            className={
-                'flex h-3.5 min-w-3.5 items-center justify-center rounded-md border-[0.5px] border-black bg-white'
-            }
-        >
-            <Plus size={10} strokeWidth={2.5} color={'black'} />
-        </div>
-        <div
-            className={
-                'box-content h-[1.5px] w-full rounded-r-md border-[0.5px] border-l-0 border-black bg-white'
-            }
-        />
-    </div>
-)

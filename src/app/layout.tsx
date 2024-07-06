@@ -1,5 +1,7 @@
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
+import { ReactNode } from 'react'
+import StyledComponentsRegistry from '@/lib/registry'
 import { Inter, Montserrat } from 'next/font/google'
 import { cn } from '@/lib/utils'
 
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
     children,
 }: Readonly<{
-    children: React.ReactNode
+    children: ReactNode
 }>) {
     return (
         <html lang='de'>
@@ -29,7 +31,7 @@ export default function RootLayout({
                     montserrat.variable
                 )}
             >
-                {children}
+                <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
             </body>
         </html>
     )
