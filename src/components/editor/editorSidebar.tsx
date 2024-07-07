@@ -267,7 +267,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                         onClick={() => deleteCard(selected.uuid)}
                         className='rounded-md border-2 border-red-500 bg-white px-4 py-2 font-semibold text-red-500'
                     >
-                        Delete
+                        Löschen
                     </button>
                 </Fragment>
             )}

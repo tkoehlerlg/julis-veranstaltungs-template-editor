@@ -47,7 +47,7 @@ export function EventCard({ card: eventCard }: { card: IEventCard }) {
                     box-sizing: border-box;
                     height: 100%;
                     width: 100%;
-                    transform: skewX(9deg);
+                    transform: skewX(-9deg);
                     border-width: ${isSelected ? '2.5px' : '0'};
                     border-color: ${isColorLight(eventCard.backgroundColor)
                         ? theme.palette.black
@@ -55,11 +55,7 @@ export function EventCard({ card: eventCard }: { card: IEventCard }) {
                 `}
             />
             <p
-                onClick={() =>
-                    setTimeout(() => {
-                        focusEditorSidebarTitle()
-                    }, 10)
-                }
+                onClick={() => setTimeout(() => focusEditorSidebarTitle(), 10)}
                 css={css`
                     position: relative;
                     cursor: text;
@@ -69,10 +65,12 @@ export function EventCard({ card: eventCard }: { card: IEventCard }) {
                     font-family: ${theme.font.montserrat};
                     font-size: ${theme.fontSize.extraTiny};
                     font-weight: 900;
-                    color: ${eventCard.textColor};
+                    color: ${eventCard.title === ''
+                        ? theme.palette.whiteOpacity[500]
+                        : eventCard.textColor};
                 `}
             >
-                {eventCard.title}
+                {eventCard.title === '' ? 'Event Title' : eventCard.title}
             </p>
         </div>
     )

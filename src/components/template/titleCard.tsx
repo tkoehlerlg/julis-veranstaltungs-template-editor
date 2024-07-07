@@ -55,15 +55,8 @@ export function TitleCard() {
                 `}
             />
             <p
-                onClick={() =>
-                    setTimeout(() => {
-                        focusEditorSidebarTitle()
-                    }, 10)
-                }
+                onClick={() => setTimeout(() => focusEditorSidebarTitle(), 10)}
                 css={css`
-                    color: ${titleCard.title === ''
-                        ? theme.palette.whiteOpacity[500]
-                        : titleCard.textColor};
                     position: relative;
                     cursor: text;
                     white-space: pre-wrap;
@@ -72,6 +65,9 @@ export function TitleCard() {
                     font-family: ${theme.font.montserrat};
                     font-size: ${theme.fontSize.medium};
                     font-weight: 900;
+                    color: ${titleCard.title === ''
+                        ? theme.palette.whiteOpacity[500]
+                        : titleCard.textColor};
                 `}
             >
                 {titleCard.title === '' ? 'Titel' : titleCard.title}
