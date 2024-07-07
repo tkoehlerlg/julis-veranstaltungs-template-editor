@@ -14,7 +14,7 @@ import {
     eventCardSchema,
     Selection,
 } from './types'
-import { uuid } from 'uuidv4'
+import { v4 as uuidv4 } from 'uuid'
 import { ChildProps } from '@/lib/propTypes'
 import { THEME } from '@/utils/theme'
 import { IEditorSidebarRef } from '@/components/editor/editorSidebar'
@@ -87,7 +87,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
     })
     const [cards, baseSetCards] = useState<IEventCard[]>([
         {
-            uuid: uuid(),
+            uuid: uuidv4(),
             title: '',
             ...defaultStyle,
         },
@@ -167,7 +167,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         baseSetTitleCard({ title: '', ...defaultStyle })
         baseSetCards([
             {
-                uuid: uuid(),
+                uuid: uuidv4(),
                 title: '',
                 ...defaultStyle,
             },
@@ -188,7 +188,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
     const addCard = useCallback(
         (atPosition?: number) => {
             const newCard: IEventCard = {
-                uuid: uuid(),
+                uuid: uuidv4(),
                 title: 'Neues Event',
                 textColor: THEME.palette.template.yellow,
                 backgroundColor: THEME.palette.template.magenta,
