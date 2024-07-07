@@ -37,6 +37,8 @@ const EditorCPAttribute = {
 } as const
 
 export function EditorSidebar() {
+    const theme = useTheme()
+
     const prevEditorIdRef = useRef<string>()
     const [selectedCPAttribute, setSelectedCPAttribute] = useState<
         (typeof EditorCPAttribute)[keyof typeof EditorCPAttribute]
@@ -164,12 +166,24 @@ export function EditorSidebar() {
     }, [editorId])
 
     return selected ? (
-        <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
+        <Flex
+            dir='column'
+            gap={10}
+            styles={css`
+                height: 100%;
+                width: 100%;
+                background: ${theme.palette.gray[100]};
+                padding: 16px 4px 4px;
+            `}
+        >
             <h2
-                className={cn(
-                    'text-xl font-bold',
-                    selectedType !== 'background' && '-mb-5'
-                )}
+                css={css`
+                    font-size: ${theme.fontSize.smallLarge};
+                    font-weight: bold;
+                    margin-bottom: ${selectedType !== 'background'
+                        ? '-20px'
+                        : '0'};
+                `}
             >
                 Edit Sidebar
             </h2>
@@ -185,7 +199,13 @@ export function EditorSidebar() {
                         onChange={(e) => setSelectedText(e.target.value)}
                         placeholder='16. April - JuLis & Friends...'
                         id='text-field'
-                        className='resize-none border border-slate-300  focus:ring-slate-300'
+                        css={css`
+                            resize: none;
+                            border: 1px solid ${theme.palette.slate[300]};
+                            &:focus {
+                                outline: 2px solid ${theme.palette.slate[300]};
+                            }
+                        `}
                     />
                 </div>
             )}
@@ -240,7 +260,7 @@ export function EditorSidebar() {
                     </button>
                 </Fragment>
             )}
-        </div>
+        </Flex>
     ) : (
         <div className='flex h-full w-full flex-col gap-2.5 bg-[#FCFCFC] p-4 pt-16'>
             <h2 className={'text-xl font-bold'}>Bearbeitungsleiste</h2>

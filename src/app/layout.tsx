@@ -1,17 +1,13 @@
 import '@/styles/globals.css'
-import type { Metadata } from 'next'
-import { ReactNode } from 'react'
-import StyledComponentsRegistry from '@/lib/registry'
-import { Inter, Montserrat } from 'next/font/google'
-import { cn } from '@/lib/utils'
-import { css } from 'styled-components'
-import { THEME } from '@/utils/theme'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
-const montserrat = Montserrat({
-    subsets: ['latin'],
-    variable: '--font-monserrat',
-})
+import type { Metadata } from 'next'
+import StyledComponentsRegistry from '@/lib/registry'
+import { cn } from '@/lib/utils'
+import { GlobalThemeWrapper } from '@/contexts/themeContext'
+import { THEME } from '@/utils/theme'
+import { inter, montserrat } from '@/lib/font'
+import { css } from 'styled-components'
+import { ChildProps } from '@/lib/propTypes'
 
 export const metadata: Metadata = {
     title: 'JuLis - Veranstaltungs-Template-Editor',
@@ -19,11 +15,7 @@ export const metadata: Metadata = {
         'Erstelle schenll und einfach Übersichten für deine nächsten Veranstaltungen',
 }
 
-export default function RootLayout({
-    children,
-}: Readonly<{
-    children: ReactNode
-}>) {
+export default function RootLayout({ children }: ChildProps) {
     return (
         <html lang='de'>
             <body
@@ -38,7 +30,9 @@ export default function RootLayout({
                     fontFamily: THEME.fontFamily.inter,
                 }}
             >
-                <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
+                <StyledComponentsRegistry>
+                    <GlobalThemeWrapper>{children}</GlobalThemeWrapper>
+                </StyledComponentsRegistry>
             </body>
         </html>
     )

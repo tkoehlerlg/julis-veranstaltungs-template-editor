@@ -35,6 +35,7 @@ export function TitleCard() {
                     'absolute -left-0.5 box-border h-full w-full -skew-x-[9deg] border-[2.5px]'
                 }
                 style={{
+                    zIndex: -1,
                     backgroundColor: titleCard.backgroundColor,
                     borderColor: isSelected
                         ? !isColorLight(titleCard.backgroundColor)
@@ -48,7 +49,15 @@ export function TitleCard() {
                 onChange={(e) => updateTitleCard({ title: e.target.value })}
                 placeholder={'Titel'}
                 css={css`
-                    background-color: blue;
+                    display: inline-block;
+                    vertical-align: center;
+                    resize: none;
+                    text-align: center;
+                    min-width: 200px;
+                    max-width: 95%;
+                    background-color: transparent;
+                    // focus
+                    outline: none;
                 `}
             />
         </div>
