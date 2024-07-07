@@ -13,6 +13,9 @@ import {
     IEventCard,
     eventCardSchema,
     Selection,
+    ICategory,
+    categorySchema,
+    ICardStyles,
 } from './types'
 import { v4 as uuidv4 } from 'uuid'
 import { ChildProps } from '@/lib/propTypes'
@@ -37,9 +40,11 @@ interface IEditorContent {
     addCard: (atPosition?: number) => void
     updateCard(uuid: string, card: Partial<IEventCard>): void
     deleteCard: (uuid: string) => void
-    editorSidebarRef?: RefObject<IEditorSidebarRef>
-    focusEditorSidebarTitle: () => void
     moveCard: (uuid: string, direction: 'up' | 'down', by?: number) => void
+    editorSidebarRef?: RefObject<IEditorSidebarRef>
+    categories: ICategory[]
+    updateCategory: (uuid: string, category: Partial<ICategory>) => void
+    focusEditorSidebarTitle: () => void
 }
 
 const didNotInitAlert = () =>
@@ -62,9 +67,11 @@ const TemplateEditorContext = createContext<IEditorContent>({
     addCard: () => didNotInitAlert,
     updateCard: () => didNotInitAlert,
     deleteCard: () => didNotInitAlert,
+    moveCard: () => didNotInitAlert,
+    categories: [],
+    updateCategory: () => didNotInitAlert,
     editorSidebarRef: undefined,
     focusEditorSidebarTitle: () => didNotInitAlert,
-    moveCard: () => didNotInitAlert,
 })
 
 const defaultStyle = {
@@ -92,6 +99,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
             ...defaultStyle,
         },
     ])
+    const [categories, baseSetCategories] = useState<ICategory[]>([])
     const editorSidebarRef = useRef<IEditorSidebarRef>(null)
 
     const setTemplateBackgroundColor = useCallback((color: string) => {
@@ -119,9 +127,27 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         []
     )
 
+    const setCategories = useCallback(
+        (
+            categories: ICategory[] | ((prevState: ICategory[]) => ICategory[])
+        ) => {
+            baseSetCategories((prevState) => {
+                const newCategories =
+                    typeof categories === 'function'
+                        ? categories(prevState)
+                        : categories
+                localStorage.setItem(
+                    'categories',
+                    JSON.stringify(newCategories)
+                )
+                return newCategories
+            })
+        },
+        []
+    )
+
     // Run on mount only
     useEffect(() => {
-        let problemsWhileLoading = false
         const templateBackgroundColor = localStorage.getItem(
             'templateBackgroundColor'
         )
@@ -138,11 +164,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                     baseSetTitleCard(parsedTitleCard.data)
                 }
             }
-        } catch (error) {
-            problemsWhileLoading = true
-            console.error('Error loading from localStorage', error)
-        }
-        try {
+
             const cards = localStorage.getItem('cards')
             if (cards && cards !== 'undefined') {
                 const parsedCards = eventCardSchema
@@ -152,11 +174,20 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                     baseSetCards(parsedCards.data)
                 }
             }
+
+            const categories = localStorage.getItem('categories')
+            if (categories && categories !== 'undefined') {
+                const parsedCategories = categorySchema
+                    .array()
+                    .safeParse(JSON.parse(categories))
+                if (parsedCategories.success) {
+                    baseSetCategories(parsedCategories.data)
+                }
+            }
+            setIsLoadingFromLocalStorage(false)
         } catch (error) {
-            problemsWhileLoading = true
             console.error('Error loading from localStorage', error)
         }
-        setIsLoadingFromLocalStorage(problemsWhileLoading)
     }, [])
 
     const resetLocalStorage = useCallback(() => {
@@ -251,6 +282,16 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         [cards, setCards]
     )
 
+    const updateCategory = useCallback(
+        (uuid: string, category: Partial<ICategory>) =>
+            setCategories((prevState) =>
+                prevState.map((cat) =>
+                    cat.uuid === uuid ? { ...cat, ...category } : cat
+                )
+            ),
+        [setCategories]
+    )
+
     const focusEditorSidebarTitle = useCallback(() => {
         editorSidebarRef.current?.focusTextArea()
     }, [editorSidebarRef])
@@ -270,6 +311,8 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 addCard,
                 updateCard,
                 deleteCard,
+                categories,
+                updateCategory,
                 editorSidebarRef,
                 focusEditorSidebarTitle,
                 moveCard,

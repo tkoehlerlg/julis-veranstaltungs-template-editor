@@ -36,7 +36,21 @@ export const eventCardSchema = z.object({
     backgroundColor: hexSchema,
 })
 
-interface ICardStyles {
+export interface ICategory extends ICardStyles {
+    uuid: string
+    categoryId?: string
+    name: string
+}
+
+export const categorySchema = z.object({
+    uuid: z.string(),
+    categoryId: z.string().optional(),
+    name: z.string(),
+    textColor: hexSchema,
+    backgroundColor: hexSchema,
+})
+
+export interface ICardStyles {
     textColor: string
     backgroundColor: string
 }
