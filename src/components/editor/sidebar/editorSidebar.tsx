@@ -9,22 +9,25 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { SwitchButton } from '@/components/ui/switchButton'
-import { ThemeTemplate } from '@/lib/color'
 import { cn } from '@/lib/utils'
 import { ColorMenu, FeaturedColor } from '@/components/editor/sidebar/colorMenu'
 import { useTemplateEditorContext } from '@/contexts/templateEditor/templateEditorContext'
+import { THEME } from '@/utils/theme'
+import { css } from 'styled-components'
+import { useTheme } from '@/contexts/themeContext'
+import { Flex } from '@/components/common/Flex'
 
 const defaultCardFeatureColors: FeaturedColor[] = [
-    { name: 'Blau', color: ThemeTemplate.blue },
-    { name: 'Magenta', color: ThemeTemplate.magenta },
-    { name: 'Gelb', color: ThemeTemplate.yellow },
-    { name: 'Weiß', color: ThemeTemplate.white },
-    { name: 'Schwarz', color: ThemeTemplate.black },
+    { name: 'Blau', color: THEME.palette.template.blue },
+    { name: 'Magenta', color: THEME.palette.template.magenta },
+    { name: 'Gelb', color: THEME.palette.template.yellow },
+    { name: 'Weiß', color: THEME.palette.white },
+    { name: 'Schwarz', color: THEME.palette.black },
 ]
 
 const defaultBackgroundFeatureColors: FeaturedColor[] = [
-    { name: 'D. Grau', color: ThemeTemplate.background },
-    { name: 'Magenta', color: ThemeTemplate.magenta },
+    { name: 'D. Grau', color: THEME.palette.background },
+    { name: 'Magenta', color: THEME.palette.template.magenta },
 ]
 
 // EditorColorPickerAttribute

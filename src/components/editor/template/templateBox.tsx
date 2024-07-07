@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
-import { isColorLight, ThemeTemplate } from '@/lib/color'
+import { isColorLight } from '@/lib/color'
 import { cn } from '@/lib/utils'
+import { THEME } from '@/utils/theme'
 
 type TemplateBoxProps = {
     isSelected?: boolean
@@ -28,7 +29,7 @@ export function TemplateBox({
                 borderColor: isSelected
                     ? isColorLight(backgroundColor)
                         ? 'black'
-                        : ThemeTemplate.magenta
+                        : THEME.palette.template.magenta
                     : 'transparent',
             }}
             onClick={(e) => {
