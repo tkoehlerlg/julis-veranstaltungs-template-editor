@@ -44,11 +44,24 @@ function TemplateEditor() {
             <ResizablePanelGroup direction='horizontal'>
                 <ResizablePanel
                     defaultSize={75}
-                    className={'flex h-dvh flex-col pl-10 pt-11'}
+                    css={css`
+                        display: flex;
+                        flex-direction: column;
+                        height: 100dvh;
+                        padding-top: 40px;
+                        padding-left: 40px;
+                    `}
                     onClick={() => setSelected(undefined)}
                 >
                     <Flex dir='row' align='center' gap={20}>
-                        <h1 className='font-monserrat text-3xl font-black text-magenta'>
+                        <h1
+                            css={css`
+                                font-family: ${theme.font.montserrat};
+                                font-size: ${theme.fontSize.display6};
+                                font-weight: 900;
+                                color: ${theme.palette.template.magenta};
+                            `}
+                        >
                             JuLis Veranstaltungs-Template-Editor
                         </h1>
                         <button
