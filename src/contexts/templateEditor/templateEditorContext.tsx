@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useState } from 'react'
-import { ThemeTemplate } from '@/lib/color'
 import { ITitleCard, IEventCard, Selection } from './types'
 import { uuid } from 'uuidv4'
-import { ChildProps } from '@/lib/props'
+import { ChildProps } from '@/lib/propTypes'
+import { THEME } from '@/utils/theme'
 
 interface IEditorContent {
     selected?: Selection
@@ -28,12 +28,12 @@ const didNotInitAlert = () =>
 const TemplateEditorContext = createContext<IEditorContent>({
     selected: undefined,
     setSelected: () => didNotInitAlert,
-    templateBackgroundColor: ThemeTemplate.background,
+    templateBackgroundColor: THEME.palette.template.background,
     updateTemplateBackgroundColor: () => didNotInitAlert,
     titleCard: {
         title: '',
-        textColor: ThemeTemplate.yellow,
-        backgroundColor: ThemeTemplate.magenta,
+        textColor: THEME.palette.template.yellow,
+        backgroundColor: THEME.palette.template.magenta,
     },
     updateTitleCard: () => didNotInitAlert,
     cards: [],
@@ -47,25 +47,25 @@ export const useTemplateEditorContext = () => useContext(TemplateEditorContext)
 export function TemplateEditorContextProvider({ children }: ChildProps) {
     const [selected, setSelected] = useState<Selection | undefined>(undefined)
     const [templateBackgroundColor, setTemplateBackgroundColor] = useState(
-        ThemeTemplate.background as string
+        THEME.palette.template.background as string
     )
     const [titleCard, setTitleCard] = useState<ITitleCard>({
         title: '',
-        textColor: ThemeTemplate.yellow,
-        backgroundColor: ThemeTemplate.magenta,
+        textColor: THEME.palette.template.yellow,
+        backgroundColor: THEME.palette.template.magenta,
     })
     const [cards, setCards] = useState<IEventCard[]>([
         {
             uuid: '000',
             title: 'Test Event',
-            textColor: ThemeTemplate.yellow,
-            backgroundColor: ThemeTemplate.magenta,
+            textColor: THEME.palette.template.yellow,
+            backgroundColor: THEME.palette.template.magenta,
         },
         {
             uuid: '001',
             title: 'Test Event 2',
-            textColor: ThemeTemplate.yellow,
-            backgroundColor: ThemeTemplate.magenta,
+            textColor: THEME.palette.template.yellow,
+            backgroundColor: THEME.palette.template.magenta,
         },
     ])
 
@@ -84,8 +84,8 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         const newCard: IEventCard = {
             uuid: uuid(),
             title: 'Neues Event',
-            textColor: ThemeTemplate.yellow,
-            backgroundColor: ThemeTemplate.magenta,
+            textColor: THEME.palette.template.yellow,
+            backgroundColor: THEME.palette.template.magenta,
         }
         if (atPosition !== undefined) {
             setCards((prevState) => {

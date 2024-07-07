@@ -14,6 +14,7 @@ import { AddButton } from '@/components/editor/template/addButton'
 import { EventCardView } from '@/components/editor/template/eventCard'
 import { TemplateBox } from '@/components/editor/template/templateBox'
 import { TitleCard } from '@/components/editor/template/titleCard'
+import { css } from 'styled-components'
 
 export default function App() {
     return (

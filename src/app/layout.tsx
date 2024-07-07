@@ -4,6 +4,8 @@ import { ReactNode } from 'react'
 import StyledComponentsRegistry from '@/lib/registry'
 import { Inter, Montserrat } from 'next/font/google'
 import { cn } from '@/lib/utils'
+import { css } from 'styled-components'
+import { THEME } from '@/utils/theme'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 const montserrat = Montserrat({
@@ -26,10 +28,15 @@ export default function RootLayout({
         <html lang='de'>
             <body
                 className={cn(
-                    'bg-background min-h-screen font-sans antialiased',
+                    'antialiased',
                     inter.variable,
                     montserrat.variable
                 )}
+                style={{
+                    backgroundColor: THEME.palette.white,
+                    minHeight: '100vh',
+                    fontFamily: THEME.fontFamily.inter,
+                }}
             >
                 <StyledComponentsRegistry>{children}</StyledComponentsRegistry>
             </body>

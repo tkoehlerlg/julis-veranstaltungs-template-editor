@@ -42,9 +42,8 @@ const PALETTE = {
         blue: '#119EE5',
         magenta: '#E5017C',
         yellow: '#FEED00',
+        background: '#1E1F21',
     },
-
-    background: '#1E1F21',
 } as const
 
 const FONT_SIZE = {

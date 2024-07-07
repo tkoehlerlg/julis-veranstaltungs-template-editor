@@ -26,7 +26,7 @@ const defaultCardFeatureColors: FeaturedColor[] = [
 ]
 
 const defaultBackgroundFeatureColors: FeaturedColor[] = [
-    { name: 'D. Grau', color: THEME.palette.background },
+    { name: 'D. Grau', color: THEME.palette.template.background },
     { name: 'Magenta', color: THEME.palette.template.magenta },
 ]
 
