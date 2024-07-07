@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 import { GlobalThemeWrapper } from '@/contexts/themeContext'
 import { THEME } from '@/utils/theme'
 import { inter, montserrat } from '@/lib/font'
-import { css } from 'styled-components'
 import { ChildProps } from '@/lib/propTypes'
 
 export const metadata: Metadata = {
@@ -27,7 +26,7 @@ export default function RootLayout({ children }: ChildProps) {
                 style={{
                     backgroundColor: THEME.palette.white,
                     minHeight: '100vh',
-                    fontFamily: THEME.fontFamily.inter,
+                    fontFamily: THEME.font.inter,
                 }}
             >
                 <StyledComponentsRegistry>

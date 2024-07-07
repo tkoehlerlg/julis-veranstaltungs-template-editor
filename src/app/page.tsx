@@ -5,16 +5,15 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable'
-import { EditorSidebar } from '@/components/editor/sidebar'
+import { EditorSidebar } from '@/components/editor'
 import {
     TemplateEditorContextProvider,
     useTemplateEditorContext,
-} from '@/contexts/templateEditor/templateEditorContext'
-import { AddButton } from '@/components/editor/template/addButton'
-import { EventCardView } from '@/components/editor/template/eventCard'
-import { TemplateBox } from '@/components/editor/template/templateBox'
-import { TitleCard } from '@/components/editor/template/titleCard'
-import { css } from 'styled-components'
+} from '@/contexts/templateEditor'
+import { AddButton } from '@/components/template/addButton'
+import { EventCard } from '@/components/template/eventCard'
+import { TemplateBox } from '@/components/template/templateBox'
+import { TitleCard } from '@/components/template/titleCard'
 
 export default function App() {
     return (
@@ -29,9 +28,9 @@ function TemplateEditor() {
         selected,
         setSelected,
         templateBackgroundColor,
-        titleCard,
         cards,
         addCard,
+        editorSidebarRef,
     } = useTemplateEditorContext()
 
     return (
@@ -61,19 +60,7 @@ function TemplateEditor() {
                             <div className={'relative flex flex-col gap-1'}>
                                 {cards.map((card, index) => (
                                     <div key={card.uuid}>
-                                        <EventCardView
-                                            {...card}
-                                            isSelected={
-                                                selected?.type === 'card' &&
-                                                selected.uuid == card.uuid
-                                            }
-                                            onClick={() =>
-                                                setSelected({
-                                                    type: 'card',
-                                                    uuid: card.uuid,
-                                                })
-                                            }
-                                        />
+                                        <EventCard card={card} />
                                         <AddButton
                                             paddingTop={6.5}
                                             paddingBottom={
@@ -96,7 +83,7 @@ function TemplateEditor() {
                     defaultSize={25}
                     className={'border-l'}
                 >
-                    <EditorSidebar />
+                    <EditorSidebar ref={editorSidebarRef} />
                 </ResizablePanel>
             </ResizablePanelGroup>
         </main>

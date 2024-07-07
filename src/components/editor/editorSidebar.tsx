@@ -1,7 +1,9 @@
 import {
+    forwardRef,
     Fragment,
     useCallback,
     useEffect,
+    useImperativeHandle,
     useMemo,
     useRef,
     useState,
@@ -9,13 +11,16 @@ import {
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { SwitchButton } from '@/components/ui/switchButton'
-import { cn } from '@/lib/utils'
-import { ColorMenu, FeaturedColor } from '@/components/editor/sidebar/colorMenu'
-import { useTemplateEditorContext } from '@/contexts/templateEditor/templateEditorContext'
+import { ColorMenu, FeaturedColor } from '@/components/editor/colorMenu'
+import { useTemplateEditorContext } from '@/contexts/templateEditor'
 import { THEME } from '@/utils/theme'
 import { css } from 'styled-components'
 import { useTheme } from '@/contexts/themeContext'
 import { Flex } from '@/components/common/Flex'
+
+export interface IEditorSidebarRef {
+    focusTextArea: () => void
+}
 
 const defaultCardFeatureColors: FeaturedColor[] = [
     { name: 'Blau', color: THEME.palette.template.blue },
@@ -36,10 +41,11 @@ const EditorCPAttribute = {
     background: 'Background',
 } as const
 
-export function EditorSidebar() {
+const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
     const theme = useTheme()
 
     const prevEditorIdRef = useRef<string>()
+    const textAreaRef = useRef<HTMLTextAreaElement>(null)
     const [selectedCPAttribute, setSelectedCPAttribute] = useState<
         (typeof EditorCPAttribute)[keyof typeof EditorCPAttribute]
     >(EditorCPAttribute.text)
@@ -157,6 +163,10 @@ export function EditorSidebar() {
         ]
     )
 
+    useImperativeHandle(ref, () => ({
+        focusTextArea: () => textAreaRef.current?.focus(),
+    }))
+
     // Reset selected attribute when switching between selected elements
     useEffect(() => {
         if (prevEditorIdRef.current !== editorId) {
@@ -173,14 +183,14 @@ export function EditorSidebar() {
                 height: 100%;
                 width: 100%;
                 background: ${theme.palette.gray[100]};
-                padding: 16px 4px 4px;
+                padding: 64px 16px 16px;
             `}
         >
             <h2
                 css={css`
                     font-size: ${theme.fontSize.smallLarge};
                     font-weight: bold;
-                    margin-bottom: ${selectedType !== 'background'
+                    margin-bottom: ${selectedType === 'background'
                         ? '-20px'
                         : '0'};
                 `}
@@ -195,6 +205,7 @@ export function EditorSidebar() {
                             : 'Überschrift'}
                     </Label>
                     <Textarea
+                        ref={textAreaRef}
                         value={selectedText}
                         onChange={(e) => setSelectedText(e.target.value)}
                         placeholder='16. April - JuLis & Friends...'
@@ -269,4 +280,8 @@ export function EditorSidebar() {
             </p>
         </div>
     )
-}
+})
+
+EditorSidebar.displayName = 'EditorSidebar'
+
+export { EditorSidebar }

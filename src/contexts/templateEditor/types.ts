@@ -16,9 +16,7 @@ export interface ITitleCard extends ICardStyles {
 
 export interface IEventCard extends ICardStyles {
     uuid: string
-    isSelected?: boolean
     title: string
-    onClick?: () => void
 }
 
 interface ICardStyles {

@@ -1,8 +1,16 @@
-import { createContext, useCallback, useContext, useState } from 'react'
+import {
+    createContext,
+    RefObject,
+    useCallback,
+    useContext,
+    useRef,
+    useState,
+} from 'react'
 import { ITitleCard, IEventCard, Selection } from './types'
 import { uuid } from 'uuidv4'
 import { ChildProps } from '@/lib/propTypes'
 import { THEME } from '@/utils/theme'
+import { IEditorSidebarRef } from '@/components/editor/editorSidebar'
 
 interface IEditorContent {
     selected?: Selection
@@ -20,6 +28,8 @@ interface IEditorContent {
     addCard: (atPosition?: number) => void
     updateCard(uuid: string, card: Partial<IEventCard>): void
     deleteCard: (uuid: string) => void
+    editorSidebarRef?: RefObject<IEditorSidebarRef>
+    focusEditorSidebarTitle: () => void
 }
 
 const didNotInitAlert = () =>
@@ -40,6 +50,8 @@ const TemplateEditorContext = createContext<IEditorContent>({
     addCard: () => didNotInitAlert,
     updateCard: () => didNotInitAlert,
     deleteCard: () => didNotInitAlert,
+    editorSidebarRef: undefined,
+    focusEditorSidebarTitle: () => didNotInitAlert,
 })
 
 export const useTemplateEditorContext = () => useContext(TemplateEditorContext)
@@ -68,6 +80,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
             backgroundColor: THEME.palette.template.magenta,
         },
     ])
+    const editorSidebarRef = useRef<IEditorSidebarRef>(null)
 
     const updateTemplateBackgroundColor = useCallback(
         (color: string) => setTemplateBackgroundColor(color),
@@ -129,6 +142,10 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         [cards, selected]
     )
 
+    const focusEditorSidebarTitle = useCallback(() => {
+        editorSidebarRef.current?.focusTextArea()
+    }, [editorSidebarRef])
+
     return (
         <TemplateEditorContext.Provider
             value={{
@@ -142,6 +159,8 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 addCard,
                 updateCard,
                 deleteCard,
+                editorSidebarRef,
+                focusEditorSidebarTitle,
             }}
         >
             {children}

@@ -148,7 +148,7 @@ const Flex = forwardRef<HTMLDivElement, FlexProps>(
         cursor: ${onClick ? 'pointer' : 'default'};
             -webkit-tap-highlight-color: transparent;
 
-            :focus {
+            &:focus {
                 outline: none;
             }
 

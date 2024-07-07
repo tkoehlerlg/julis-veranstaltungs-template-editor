@@ -2,6 +2,17 @@ import { inter, montserrat } from '@/lib/font'
 
 const PALETTE = {
     white: '#ffffff',
+    whiteOpacity: {
+        100: 'rgba(255, 255, 255, 0.1)',
+        200: 'rgba(255, 255, 255, 0.2)',
+        300: 'rgba(255, 255, 255, 0.3)',
+        400: 'rgba(255, 255, 255, 0.4)',
+        500: 'rgba(255, 255, 255, 0.5)',
+        600: 'rgba(255, 255, 255, 0.6)',
+        700: 'rgba(255, 255, 255, 0.7)',
+        800: 'rgba(255, 255, 255, 0.8)',
+        900: 'rgba(255, 255, 255, 0.9)',
+    },
     black: '#000000',
     transparent: 'transparent',
     transparentWhite: 'rgba(255, 255, 255, 0)',
@@ -47,6 +58,7 @@ const PALETTE = {
 } as const
 
 const FONT_SIZE = {
+    extraTiny: '10px',
     tiny: '11px',
     extraSmall: '12px',
     small: '14px',
@@ -63,8 +75,8 @@ const FONT_SIZE = {
 } as const
 
 const FONT_FAMILY = {
-    inter: inter.className + ', sans-serif',
-    montserrat: montserrat.className + ', sans-serif',
+    inter: inter.style.fontFamily + ', sans-serif',
+    montserrat: montserrat.style.fontFamily + ', sans-serif',
 } as const
 
 const BREAKPOINTS = {
@@ -109,7 +121,7 @@ export const THEME = {
     zIndex: Z_INDEX,
     shadows: SHADOWS,
     fontSize: FONT_SIZE,
-    fontFamily: FONT_FAMILY,
+    font: FONT_FAMILY,
     borderRadius: BORDER_RADIUS,
     transition: TRANSITION,
 }
