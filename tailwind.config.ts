@@ -1,8 +1,7 @@
 import type { Config } from 'tailwindcss'
 import { fontFamily } from 'tailwindcss/defaultTheme'
 
-/** @type {import('tailwindcss').Config} */
-const config = {
+const config: import('tailwindcss').Config = {
     darkMode: ['class'],
     content: [
         './pages/**/*.{ts,tsx}',
@@ -37,9 +36,6 @@ const config = {
             fontFamily: {
                 sans: ['var(--font-sans)', ...fontFamily.sans],
                 monserrat: ['var(--font-monserrat)', ...fontFamily.mono],
-            },
-            colors: {
-                magenta: '#E5017C',
             },
         },
     },
