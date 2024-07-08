@@ -17,6 +17,8 @@ import { TitleCard } from '@/components/template/titleCard'
 import { Flex } from '@/components/common/Flex'
 import { css } from 'styled-components'
 import { useTheme } from '@/contexts/themeContext'
+import { CategoriesContainer } from '@/components/template/categoriesContainer'
+import { PopUp } from '@/components/common/PopUp'
 
 export default function App() {
     return (
@@ -36,6 +38,7 @@ function TemplateEditor() {
         templateBackgroundColor,
         cards,
         addCard,
+        categories,
         editorSidebarRef,
     } = useTemplateEditorContext()
 
@@ -114,6 +117,7 @@ function TemplateEditor() {
                                         </div>
                                     ))}
                                 </div>
+                                <CategoriesContainer categories={categories} />
                             </TemplateBox>
                         ) : (
                             <div>Lade von Lokalem Speicher...</div>

@@ -15,12 +15,12 @@ import {
     Selection,
     ICategory,
     categorySchema,
-    ICardStyles,
 } from './types'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid'
 import { ChildProps } from '@/lib/propTypes'
 import { THEME } from '@/utils/theme'
 import { IEditorSidebarRef } from '@/components/editor/editorSidebar'
+import { pick } from 'next/dist/lib/pick'
 
 interface IEditorContent {
     isLoadingFromLocalStorage: boolean
@@ -81,6 +81,8 @@ const defaultStyle = {
 
 export const useTemplateEditorContext = () => useContext(TemplateEditorContext)
 
+const templateEditorNameSpace = '8a3e7d6f-af5c-4bfb-b0be-2d1a5e4d6f9f'
+
 export function TemplateEditorContextProvider({ children }: ChildProps) {
     const [isLoadingFromLocalStorage, setIsLoadingFromLocalStorage] =
         useState(true)
@@ -95,11 +97,18 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
     const [cards, baseSetCards] = useState<IEventCard[]>([
         {
             uuid: uuidv4(),
+            categoryId: uuidv5('category-1', templateEditorNameSpace),
             title: '',
             ...defaultStyle,
         },
     ])
-    const [categories, baseSetCategories] = useState<ICategory[]>([])
+    const [categories, baseSetCategories] = useState<ICategory[]>([
+        {
+            uuid: uuidv5('category-1', templateEditorNameSpace),
+            name: '',
+            ...defaultStyle,
+        },
+    ])
     const editorSidebarRef = useRef<IEditorSidebarRef>(null)
 
     const setTemplateBackgroundColor = useCallback((color: string) => {
@@ -283,13 +292,33 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
     )
 
     const updateCategory = useCallback(
-        (uuid: string, category: Partial<ICategory>) =>
+        (uuid: string, category: Partial<ICategory>) => {
             setCategories((prevState) =>
                 prevState.map((cat) =>
                     cat.uuid === uuid ? { ...cat, ...category } : cat
                 )
-            ),
-        [setCategories]
+            )
+            if (
+                category.textColor === undefined &&
+                category.backgroundColor === undefined
+            ) {
+                return
+            }
+            setCards((prevState) =>
+                prevState.map((card) =>
+                    card.categoryId === uuid
+                        ? {
+                              ...card,
+                              textColor: category.textColor ?? card.textColor,
+                              backgroundColor:
+                                  category.backgroundColor ??
+                                  card.backgroundColor,
+                          }
+                        : card
+                )
+            )
+        },
+        [setCategories, setCards]
     )
 
     const focusEditorSidebarTitle = useCallback(() => {

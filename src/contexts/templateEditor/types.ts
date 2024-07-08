@@ -11,6 +11,10 @@ export type Selection =
           type: 'card'
           uuid: string
       }
+    | {
+          type: 'category'
+          uuid: string
+      }
 
 const hexSchema = z.string().regex(/^#[0-9A-F]{6}$/i, 'Invalid hex color')
 
@@ -26,11 +30,13 @@ export const titleCardSchema = z.object({
 
 export interface IEventCard extends ICardStyles {
     uuid: string
+    categoryId?: string
     title: string
 }
 
 export const eventCardSchema = z.object({
-    uuid: z.string(),
+    uuid: z.string().uuid(),
+    categoryId: z.string().uuid(),
     title: z.string(),
     textColor: hexSchema,
     backgroundColor: hexSchema,
@@ -38,13 +44,11 @@ export const eventCardSchema = z.object({
 
 export interface ICategory extends ICardStyles {
     uuid: string
-    categoryId?: string
     name: string
 }
 
 export const categorySchema = z.object({
-    uuid: z.string(),
-    categoryId: z.string().optional(),
+    uuid: z.string().uuid(),
     name: z.string(),
     textColor: hexSchema,
     backgroundColor: hexSchema,

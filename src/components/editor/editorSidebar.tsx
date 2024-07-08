@@ -61,6 +61,8 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
         updateCard,
         deleteCard,
         moveCard,
+        categories,
+        updateCategory,
     } = useTemplateEditorContext()
 
     const selectedType = useMemo(() => selected?.type, [selected])
@@ -71,11 +73,22 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                 : undefined,
         [selected, cards]
     )
+    const selectedCategory = useMemo(
+        () =>
+            selected?.type === 'category'
+                ? categories.find(
+                      (category) => category.uuid === selected?.uuid
+                  )
+                : undefined,
+        [selected, categories]
+    )
 
     const editorId = useMemo(
         () =>
             selected?.type +
-            (selected?.type === 'card' ? `-${selected.uuid}` : ''),
+            (selected?.type === 'card' || selected?.type === 'category'
+                ? `-${selected.uuid}`
+                : ''),
         [selected]
     )
 
@@ -85,8 +98,15 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                 return titleCard.title
             case 'card':
                 return selectedCard?.title
+            case 'category':
+                return selectedCategory?.name
         }
-    }, [selectedType, titleCard.title, selectedCard?.title])
+    }, [
+        selectedType,
+        titleCard.title,
+        selectedCard?.title,
+        selectedCategory?.name,
+    ])
 
     const setSelectedText = useCallback(
         (text: string) => {
@@ -96,10 +116,12 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                         return updateTitleCard({ title: text })
                     case 'card':
                         return updateCard(selected.uuid, { title: text })
+                    case 'category':
+                        return updateCategory(selected.uuid, { name: text })
                 }
             }
         },
-        [selected, updateTitleCard, updateCard]
+        [selected, updateTitleCard, updateCard, updateCategory]
     )
 
     const selectedColor = useMemo(() => {
@@ -112,6 +134,8 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                     return titleCard.textColor
                 case 'card':
                     return selectedCard?.textColor
+                case 'category':
+                    return selectedCategory?.textColor
             }
         }
         switch (selectedType) {
@@ -121,22 +145,23 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                 return titleCard.backgroundColor
             case 'card':
                 return selectedCard?.backgroundColor
+            case 'category':
+                return selectedCategory?.backgroundColor
         }
     }, [
         selectedType,
         selectedCPAttribute,
-        selectedCard?.backgroundColor,
-        selectedCard?.textColor,
+        selectedCard,
         templateBackgroundColor,
-        titleCard.backgroundColor,
-        titleCard.textColor,
+        titleCard,
+        selectedCategory,
     ])
 
     const onSelectedColorChange = useCallback(
         (color: string) => {
             if (!selected) return
             if (
-                selectedType !== 'background' &&
+                selected.type !== 'background' &&
                 selectedCPAttribute === EditorCPAttribute.text
             ) {
                 switch (selected.type) {
@@ -144,6 +169,10 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                         return updateTitleCard({ textColor: color })
                     case 'card':
                         return updateCard(selected.uuid, { textColor: color })
+                    case 'category':
+                        return updateCategory(selected.uuid, {
+                            textColor: color,
+                        })
                 }
             }
             switch (selected.type) {
@@ -153,17 +182,43 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                     return updateTitleCard({ backgroundColor: color })
                 case 'card':
                     return updateCard(selected.uuid, { backgroundColor: color })
+                case 'category':
+                    return updateCategory(selected.uuid, {
+                        backgroundColor: color,
+                    })
             }
         },
         [
             selected,
-            selectedType,
             selectedCPAttribute,
             updateTitleCard,
             updateCard,
             updateTemplateBackgroundColor,
+            updateCategory,
         ]
     )
+
+    const textAreaTitle = useMemo(() => {
+        switch (selectedType) {
+            case 'title':
+                return 'Überschrift'
+            case 'card':
+                return 'Text in der Kachel'
+            case 'category':
+                return 'Name der Kategorie'
+        }
+    }, [selectedType])
+
+    const textAreaPlaceholder = useMemo(() => {
+        switch (selectedType) {
+            case 'title':
+                return 'Juli 2024'
+            case 'card':
+                return '16. April - JuLis & Friends...'
+            case 'category':
+                return 'Kategorie'
+        }
+    }, [selectedType])
 
     useImperativeHandle(ref, () => ({
         focusTextArea: () => textAreaRef.current?.focus(),
@@ -208,17 +263,13 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                         width: 100%;
                     `}
                 >
-                    <Label htmlFor='text-field'>
-                        {selectedType === 'card'
-                            ? 'Text in der Kachel'
-                            : 'Überschrift'}
-                    </Label>
+                    <Label htmlFor='text-field'>{textAreaTitle}</Label>
                     <Textarea
                         ref={textAreaRef}
+                        id='text-field'
                         value={selectedText}
                         onChange={(e) => setSelectedText(e.target.value)}
-                        placeholder='16. April - JuLis & Friends...'
-                        id='text-field'
+                        placeholder={textAreaPlaceholder}
                         css={css`
                             resize: none;
                             border: 1px solid ${theme.palette.slate[300]};
