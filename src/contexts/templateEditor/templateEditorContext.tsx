@@ -203,12 +203,21 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         localStorage.removeItem('templateBackgroundColor')
         localStorage.removeItem('titleCard')
         localStorage.removeItem('cards')
+        localStorage.removeItem('categories')
         baseSetTemplateBackgroundColor(THEME.palette.template.background)
         baseSetTitleCard({ title: '', ...defaultStyle })
         baseSetCards([
             {
                 uuid: uuidv4(),
+                categoryId: uuidv5('category-1', templateEditorNameSpace),
                 title: '',
+                ...defaultStyle,
+            },
+        ])
+        baseSetCategories([
+            {
+                uuid: uuidv5('category-1', templateEditorNameSpace),
+                name: '',
                 ...defaultStyle,
             },
         ])
