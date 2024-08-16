@@ -20,7 +20,8 @@ import { v4 as uuidv4, v5 as uuidv5 } from 'uuid'
 import { ChildProps } from '@/lib/propTypes'
 import { THEME } from '@/utils/theme'
 import { IEditorSidebarRef } from '@/components/editor/editorSidebar'
-import { pick } from 'next/dist/lib/pick'
+
+type Directions = 'down' | 'up'
 
 interface IEditorContent {
     isLoadingFromLocalStorage: boolean
@@ -41,6 +42,7 @@ interface IEditorContent {
     updateCard(uuid: string, card: Partial<IEventCard>): void
     deleteCard: (uuid: string) => void
     moveCard: (uuid: string, direction: 'up' | 'down', by?: number) => void
+    getPossibleDirectionsForCard: (uuid: string) => Directions[]
     editorSidebarRef?: RefObject<IEditorSidebarRef>
     categories: ICategory[]
     updateCategory: (uuid: string, category: Partial<ICategory>) => void
@@ -68,6 +70,7 @@ const TemplateEditorContext = createContext<IEditorContent>({
     updateCard: () => didNotInitAlert,
     deleteCard: () => didNotInitAlert,
     moveCard: () => didNotInitAlert,
+    getPossibleDirectionsForCard: () => [],
     categories: [],
     updateCategory: () => didNotInitAlert,
     editorSidebarRef: undefined,
@@ -300,6 +303,17 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         [cards, setCards]
     )
 
+    const getPossibleDirectionsForCard = useCallback(
+        (uuid: string) => {
+            const cardIndex = cards.findIndex((card) => card.uuid === uuid)
+            let possibleDirections: Directions[] = []
+            if (cardIndex > 0) possibleDirections.push('up')
+            if (cardIndex < cards.length - 1) possibleDirections.push('down')
+            return possibleDirections
+        },
+        [cards]
+    )
+
     const updateCategory = useCallback(
         (uuid: string, category: Partial<ICategory>) => {
             setCategories((prevState) =>
@@ -354,6 +368,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 editorSidebarRef,
                 focusEditorSidebarTitle,
                 moveCard,
+                getPossibleDirectionsForCard,
             }}
         >
             {children}

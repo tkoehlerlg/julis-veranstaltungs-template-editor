@@ -61,6 +61,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
         updateCard,
         deleteCard,
         moveCard,
+        getPossibleDirectionsForCard,
         categories,
         updateCategory,
     } = useTemplateEditorContext()
@@ -72,6 +73,13 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                 ? cards.find((card) => card.uuid === selected?.uuid)
                 : undefined,
         [selected, cards]
+    )
+    const possibleDirectionsForCard = useMemo(
+        () =>
+            selectedCard
+                ? getPossibleDirectionsForCard(selectedCard.uuid)
+                : undefined,
+        [selectedCard, getPossibleDirectionsForCard]
     )
     const selectedCategory = useMemo(
         () =>
@@ -325,7 +333,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                 }
             />
 
-            {selected?.type === 'card' && (
+            {selectedCard && (
                 <Fragment>
                     <h3
                         css={css`
@@ -339,7 +347,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                     </h3>
                     <Flex dir='row' align='center' gap={5}>
                         <button
-                            onClick={() => deleteCard(selected.uuid)}
+                            onClick={() => deleteCard(selectedCard.uuid)}
                             css={css`
                                 flex: 1;
                                 grid-column: span 2;
@@ -355,7 +363,10 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                             Löschen
                         </button>
                         <button
-                            onClick={() => moveCard(selected.uuid, 'up')}
+                            // prettier-ignore
+                            disabled={ !possibleDirectionsForCard?.includes('up') }
+                            onClick={() => moveCard(selectedCard.uuid, 'up')}
+                            // prettier-ignore
                             css={css`
                                 display: flex;
                                 justify-content: center;
@@ -365,12 +376,16 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                                 padding: 8px 12px;
                                 font-weight: 600;
                                 color: ${theme.palette.gray[500]};
+                                opacity: ${possibleDirectionsForCard?.includes('up') ? 1 : 0.5};
                             `}
                         >
                             <ChevronUp />
                         </button>
                         <button
-                            onClick={() => moveCard(selected.uuid, 'down')}
+                            // prettier-ignore
+                            disabled={ !possibleDirectionsForCard?.includes('down') }
+                            onClick={() => moveCard(selectedCard.uuid, 'down')}
+                            // prettier-ignore
                             css={css`
                                 display: flex;
                                 justify-content: center;
@@ -380,6 +395,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                                 padding: 8px 12px;
                                 font-weight: 600;
                                 color: ${theme.palette.gray[500]};
+                                opacity: ${possibleDirectionsForCard?.includes('down') ? 1 : 0.5};
                             `}
                         >
                             <ChevronDown />
