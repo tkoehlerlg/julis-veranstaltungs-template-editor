@@ -10,9 +10,10 @@ import {
     TemplateEditorContextProvider,
     useTemplateEditorContext,
 } from '@/contexts/templateEditor'
-import { AddButton } from '@/components/template/addButton'
-import { EventCard } from '@/components/template/eventCard'
+import { TemplateHeadline } from '@/components/template/templateHeadline'
 import { TemplateBox } from '@/components/template/templateBox'
+import { EventCard } from '@/components/template/eventCard'
+import { AddButton } from '@/components/template/addButton'
 import { TitleCard } from '@/components/template/titleCard'
 import { Flex } from '@/components/common/Flex'
 import { css } from 'styled-components'
@@ -20,7 +21,7 @@ import { useTheme } from '@/contexts/themeContext'
 import { CategoriesContainer } from '@/components/template/categoriesContainer'
 import { useRef } from 'react'
 import domToImage from 'dom-to-image'
-import { DownloadIcon } from 'lucide-react'
+import { DownloadIcon, RedoIcon, UndoIcon } from 'lucide-react'
 import { useKey } from 'react-use'
 import { Tooltip } from '@/components/common/Tooltip'
 
@@ -45,16 +46,19 @@ function TemplateEditor() {
         titleCard,
         categories,
         editorSidebarRef,
+        historyControl,
     } = useTemplateEditorContext()
 
     const saveAsImage = async () => {
         if (divRef.current) {
             try {
+                const scaleFactor = 1900 / divRef.current.offsetWidth
                 const dataUrl = await domToImage.toPng(divRef.current, {
-                    height: divRef.current.offsetHeight * 2.5,
-                    width: divRef.current.offsetWidth * 2.5,
+                    quality: 100,
+                    height: divRef.current.offsetHeight * scaleFactor,
+                    width: 1900,
                     style: {
-                        transform: 'scale(2.5)',
+                        transform: `scale(${scaleFactor * 0.8})`,
                         'transform-origin': 'top left',
                     },
                 })
@@ -69,6 +73,17 @@ function TemplateEditor() {
             }
         }
     }
+
+    useKey(
+        (e) => e.metaKey && e.key === 'z',
+        (e) => {
+            if (e.shiftKey) {
+                if (historyControl.canRedo) historyControl.redo()
+            } else {
+                if (historyControl.canUndo) historyControl.undo()
+            }
+        }
+    )
 
     return (
         <main>
@@ -85,26 +100,7 @@ function TemplateEditor() {
                     `}
                     onClick={() => setSelected(undefined)}
                 >
-                    <Flex
-                        dir='row'
-                        align='center'
-                        gap={20}
-                        styles={css`
-                            pointer-events: none;
-                        `}
-                    >
-                        <h1
-                            css={css`
-                                font-family: ${theme.font.montserrat};
-                                font-size: ${theme.fontSize.display6};
-                                font-weight: 900;
-                                color: ${theme.palette.template.magenta};
-                                pointer-events: auto;
-                            `}
-                        >
-                            JuLis Veranstaltungs-Template-Editor
-                        </h1>
-                    </Flex>
+                    <TemplateHeadline />
                     <Flex
                         align='center'
                         justify='center'

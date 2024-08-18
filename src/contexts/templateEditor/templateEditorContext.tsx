@@ -20,6 +20,7 @@ import { v4 as uuidv4, v5 as uuidv5 } from 'uuid'
 import { ChildProps } from '@/lib/propTypes'
 import { THEME } from '@/utils/theme'
 import { IEditorSidebarRef } from '@/components/editor/editorSidebar'
+import { useHistory } from '@/lib/hooks/useHistory'
 
 type Directions = 'down' | 'up'
 
@@ -47,6 +48,12 @@ interface IEditorContent {
     categories: ICategory[]
     updateCategory: (uuid: string, category: Partial<ICategory>) => void
     focusEditorSidebarTitle: () => void
+    historyControl: {
+        canUndo: boolean
+        canRedo: boolean
+        undo: () => void
+        redo: () => void
+    }
 }
 
 const didNotInitAlert = () =>
@@ -75,7 +82,20 @@ const TemplateEditorContext = createContext<IEditorContent>({
     updateCategory: () => didNotInitAlert,
     editorSidebarRef: undefined,
     focusEditorSidebarTitle: () => didNotInitAlert,
+    historyControl: {
+        canUndo: false,
+        canRedo: false,
+        undo: () => didNotInitAlert,
+        redo: () => didNotInitAlert,
+    },
 })
+
+interface TemplateState {
+    backgroundColor: string
+    titleCard: ITitleCard
+    cards: IEventCard[]
+    categories: ICategory[]
+}
 
 const defaultStyle = {
     textColor: THEME.palette.template.yellow,
@@ -90,81 +110,104 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
     const [isLoadingFromLocalStorage, setIsLoadingFromLocalStorage] =
         useState(true)
     const [selected, setSelected] = useState<Selection | undefined>(undefined)
-    const [templateBackgroundColor, baseSetTemplateBackgroundColor] = useState(
-        THEME.palette.template.background as string
-    )
-    const [titleCard, baseSetTitleCard] = useState<ITitleCard>({
-        title: '',
-        ...defaultStyle,
-    })
-    const [cards, baseSetCards] = useState<IEventCard[]>([
+    const [
         {
-            uuid: uuidv4(),
-            categoryId: uuidv5('category-1', templateEditorNameSpace),
+            backgroundColor: templateBackgroundColor,
+            titleCard,
+            cards,
+            categories,
+        },
+        setTemplateState,
+        { canGoBack, goBack, canGoForward, goForward },
+    ] = useHistory<TemplateState>({
+        backgroundColor: THEME.palette.template.background,
+        titleCard: {
             title: '',
             ...defaultStyle,
         },
-    ])
-    const [categories, baseSetCategories] = useState<ICategory[]>([
-        {
-            uuid: uuidv5('category-1', templateEditorNameSpace),
-            name: '',
-            ...defaultStyle,
-        },
-    ])
+        cards: [
+            {
+                uuid: uuidv4(),
+                categoryId: uuidv5('category-1', templateEditorNameSpace),
+                title: '',
+                ...defaultStyle,
+            },
+        ],
+        categories: [
+            {
+                uuid: uuidv5('category-1', templateEditorNameSpace),
+                name: '',
+                ...defaultStyle,
+            },
+        ],
+    })
     const editorSidebarRef = useRef<IEditorSidebarRef>(null)
 
-    const setTemplateBackgroundColor = useCallback((color: string) => {
-        localStorage.setItem('templateBackgroundColor', color)
-        baseSetTemplateBackgroundColor(color)
-    }, [])
+    const setTemplateBackgroundColor = useCallback(
+        (color: string) => {
+            localStorage.setItem('templateBackgroundColor', color)
+            setTemplateState((prevState) => ({
+                ...prevState,
+                backgroundColor: color,
+            }))
+        },
+        [setTemplateState]
+    )
 
-    const setTitleCard = useCallback((card: Partial<ITitleCard>) => {
-        baseSetTitleCard((prevState) => {
-            const newTitleCard = { ...prevState, ...card }
-            localStorage.setItem('titleCard', JSON.stringify(newTitleCard))
-            return newTitleCard
-        })
-    }, [])
+    const setTitleCard = useCallback(
+        (titleCard: Partial<ITitleCard>) => {
+            setTemplateState((prevState) => {
+                const newTitleCard = { ...prevState.titleCard, ...titleCard }
+                localStorage.setItem('titleCard', JSON.stringify(newTitleCard))
+                return { ...prevState, titleCard: newTitleCard }
+            })
+        },
+        [setTemplateState]
+    )
 
     const setCards = useCallback(
         (cards: IEventCard[] | ((prevState: IEventCard[]) => IEventCard[])) => {
-            baseSetCards((prevState) => {
+            setTemplateState((prevState) => {
                 const newCards =
-                    typeof cards === 'function' ? cards(prevState) : cards
+                    typeof cards === 'function' ? cards(prevState.cards) : cards
                 localStorage.setItem('cards', JSON.stringify(newCards))
-                return newCards
+                return { ...prevState, cards: newCards }
             })
         },
-        []
+        [setTemplateState]
     )
 
     const setCategories = useCallback(
         (
             categories: ICategory[] | ((prevState: ICategory[]) => ICategory[])
         ) => {
-            baseSetCategories((prevState) => {
+            setTemplateState((prevState) => {
                 const newCategories =
                     typeof categories === 'function'
-                        ? categories(prevState)
+                        ? categories(prevState.categories)
                         : categories
                 localStorage.setItem(
                     'categories',
                     JSON.stringify(newCategories)
                 )
-                return newCategories
+                return { ...prevState, categories: newCategories }
             })
         },
-        []
+        [setTemplateState]
     )
 
-    // Run on mount only
     useEffect(() => {
         const templateBackgroundColor = localStorage.getItem(
             'templateBackgroundColor'
         )
         if (templateBackgroundColor) {
-            baseSetTemplateBackgroundColor(templateBackgroundColor)
+            setTemplateState(
+                (prevState) => ({
+                    ...prevState,
+                    backgroundColor: templateBackgroundColor,
+                }),
+                false
+            )
         }
         const titleCard = localStorage.getItem('titleCard')
         try {
@@ -173,7 +216,13 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                     JSON.parse(titleCard)
                 )
                 if (parsedTitleCard.success) {
-                    baseSetTitleCard(parsedTitleCard.data)
+                    setTemplateState(
+                        (prevState) => ({
+                            ...prevState,
+                            titleCard: parsedTitleCard.data,
+                        }),
+                        false
+                    )
                 }
             }
 
@@ -183,7 +232,13 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                     .array()
                     .safeParse(JSON.parse(cards))
                 if (parsedCards.success) {
-                    baseSetCards(parsedCards.data)
+                    setTemplateState(
+                        (prevState) => ({
+                            ...prevState,
+                            cards: parsedCards.data,
+                        }),
+                        false
+                    )
                 }
             }
 
@@ -193,39 +248,50 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                     .array()
                     .safeParse(JSON.parse(categories))
                 if (parsedCategories.success) {
-                    baseSetCategories(parsedCategories.data)
+                    setTemplateState(
+                        (prevState) => ({
+                            ...prevState,
+                            categories: parsedCategories.data,
+                        }),
+                        false
+                    )
                 }
             }
             setIsLoadingFromLocalStorage(false)
         } catch (error) {
             console.error('Error loading from localStorage', error)
         }
-    }, [])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []) // Run on mount only
 
     const resetLocalStorage = useCallback(() => {
         localStorage.removeItem('templateBackgroundColor')
         localStorage.removeItem('titleCard')
         localStorage.removeItem('cards')
         localStorage.removeItem('categories')
-        baseSetTemplateBackgroundColor(THEME.palette.template.background)
-        baseSetTitleCard({ title: '', ...defaultStyle })
-        baseSetCards([
-            {
-                uuid: uuidv4(),
-                categoryId: uuidv5('category-1', templateEditorNameSpace),
+        setTemplateState({
+            backgroundColor: THEME.palette.template.background,
+            titleCard: {
                 title: '',
                 ...defaultStyle,
             },
-        ])
-        baseSetCategories([
-            {
-                uuid: uuidv5('category-1', templateEditorNameSpace),
-                name: '',
-                ...defaultStyle,
-            },
-        ])
-        setSelected(undefined)
-    }, [])
+            cards: [
+                {
+                    uuid: uuidv4(),
+                    categoryId: uuidv5('category-1', templateEditorNameSpace),
+                    title: '',
+                    ...defaultStyle,
+                },
+            ],
+            categories: [
+                {
+                    uuid: uuidv5('category-1', templateEditorNameSpace),
+                    name: '',
+                    ...defaultStyle,
+                },
+            ],
+        })
+    }, [setTemplateState])
 
     const updateTemplateBackgroundColor = useCallback(
         (color: string) => setTemplateBackgroundColor(color),
@@ -277,7 +343,14 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
             )
             if (selected?.type === 'card' && selected.uuid === uuid) {
                 if (index === 0) {
-                    setSelected({ type: 'title' })
+                    if (cards.length <= 1) {
+                        setSelected(undefined)
+                    } else {
+                        setSelected({
+                            type: 'card',
+                            uuid: cards[1].uuid,
+                        })
+                    }
                 } else {
                     setSelected({
                         type: 'card',
@@ -369,6 +442,12 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 focusEditorSidebarTitle,
                 moveCard,
                 getPossibleDirectionsForCard,
+                historyControl: {
+                    canUndo: canGoBack,
+                    canRedo: canGoForward,
+                    undo: goBack,
+                    redo: goForward,
+                },
             }}
         >
             {children}
