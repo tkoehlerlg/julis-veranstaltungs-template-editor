@@ -21,6 +21,8 @@ import { CategoriesContainer } from '@/components/template/categoriesContainer'
 import { useRef } from 'react'
 import domToImage from 'dom-to-image'
 import { DownloadIcon } from 'lucide-react'
+import { useKey } from 'react-use'
+import { Tooltip } from '@/components/common/Tooltip'
 
 export default function App() {
     return (
@@ -151,27 +153,35 @@ function TemplateEditor() {
                             <div>Lade von Lokalem Speicher...</div>
                         )}
                     </Flex>
-                    <button
-                        onClick={() => saveAsImage()}
-                        css={css`
+                    <Tooltip
+                        id={'download'}
+                        place={'top-end'}
+                        tooltip={'Als Bild speichern'}
+                        styles={css`
                             position: absolute;
                             bottom: 20px;
                             right: 20px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            height: 40px;
-                            width: 40px;
-                            background-color: ${theme.palette.slate[100]};
-                            border: 1px solid ${theme.palette.slate[200]};
-                            border-radius: 50%;
                         `}
                     >
-                        <DownloadIcon
-                            size={20}
-                            color={theme.palette.slate[600]}
-                        />
-                    </button>
+                        <button
+                            onClick={() => saveAsImage()}
+                            css={css`
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                height: 40px;
+                                width: 40px;
+                                background-color: ${theme.palette.slate[100]};
+                                border: 1px solid ${theme.palette.slate[200]};
+                                border-radius: 50%;
+                            `}
+                        >
+                            <DownloadIcon
+                                size={20}
+                                color={theme.palette.slate[600]}
+                            />
+                        </button>
+                    </Tooltip>
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel

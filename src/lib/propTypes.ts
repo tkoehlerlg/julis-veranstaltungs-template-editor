@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import { RuleSet } from 'styled-components'
 
 export interface ChildProps {
-    children: ReactNode
+    children: ReactNode | ReactNode[]
 }
 
 export interface StyleProps {
