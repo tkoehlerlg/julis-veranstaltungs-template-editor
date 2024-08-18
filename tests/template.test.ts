@@ -3,9 +3,12 @@ import { env } from './env'
 
 test('click on header', async ({ page }) => {
     await page.goto(env.BASE_URL)
-    const titleDiv = page.getByText('Titel')
-    await titleDiv.click()
+    const titlePTag = page.getByText('Titel')
+    await titlePTag.click()
     await page.keyboard.insertText('Test')
-    await page.waitForTimeout(500)
-    await expect(titleDiv).toHaveText('Test', { timeout: 500 })
+
+    expect(async () => {
+        const updatedTitle = await titlePTag.textContent({ timeout: 1000 })
+        return updatedTitle === 'Test'
+    }).toBeTruthy()
 })

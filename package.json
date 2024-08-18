@@ -11,7 +11,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "playwright": "npm run build && npx playwright test"
+    "playwright-build": "npm run build && npx playwright test",
+    "playwright-build:debug": "npm run build && npx playwright test --debug",
+    "playwright": "npx playwright test",
+    "playwright:debug": "npx playwright test --debug"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
