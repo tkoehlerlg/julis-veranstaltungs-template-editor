@@ -124,7 +124,17 @@ function TemplateEditor() {
                                 `}
                             >
                                 <TitleCard />
-                                <AddButton onClick={() => addCard(0)} />
+                                <AddButton
+                                    onClick={() => addCard(0)}
+                                    styles={
+                                        cards.length === 0
+                                            ? css`
+                                                  margin-top: -2px;
+                                                  margin-bottom: -9px;
+                                              `
+                                            : undefined
+                                    }
+                                />
                                 <div className={'relative flex flex-col gap-1'}>
                                     {cards.map((card, index) => (
                                         <div key={card.uuid}>
