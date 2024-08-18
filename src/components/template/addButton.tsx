@@ -1,40 +1,80 @@
 import { Plus } from 'lucide-react'
+import { CssStyles } from '@/lib/propTypes'
+import { css } from 'styled-components'
 
 export const AddButton = ({
     onClick,
     paddingTop = 0,
     paddingBottom = 0,
+    styles,
 }: {
     onClick?: () => void
     paddingTop?: number
     paddingBottom?: number
+    styles?: CssStyles
 }) => (
     <div
-        className={
-            'relative z-50 -my-1 flex h-0 w-full cursor-pointer flex-row items-center px-5 opacity-0 transition-opacity duration-200  hover:opacity-100'
-        }
-        style={{ paddingTop, paddingBottom }}
+        css={css`
+            position: relative;
+            z-index: 50;
+            margin-top: -4px;
+            margin-bottom: -4px;
+            display: flex;
+            height: 0;
+            width: 100%;
+            cursor: pointer;
+            flex-direction: row;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 200ms;
+            padding: ${paddingTop}px 20px ${paddingBottom}px;
+            &:hover {
+                opacity: 1;
+            }
+            ${styles}
+        `}
         onClick={(e) => {
             e.stopPropagation()
             onClick?.()
         }}
     >
         <div
-            className={
-                'box-content h-[1.5px] w-full rounded-l-md border-[0.5px] border-r-0 border-black bg-white'
-            }
+            css={css`
+                box-sizing: content-box;
+                height: 1.5px;
+                width: 100%;
+                border-top-left-radius: 4px;
+                border-bottom-left-radius: 4px;
+                border: 0.5px solid black;
+                border-right: 0;
+                background-color: white;
+            `}
         />
         <div
-            className={
-                'flex h-3.5 min-w-3.5 items-center justify-center rounded-md border-[0.5px] border-black bg-white'
-            }
+            css={css`
+                display: flex;
+                height: 14px;
+                min-width: 14px;
+                align-items: center;
+                justify-content: center;
+                border-radius: 4px;
+                border: 0.5px solid black;
+                background-color: white;
+            `}
         >
             <Plus size={10} strokeWidth={2.5} color={'black'} />
         </div>
         <div
-            className={
-                'box-content h-[1.5px] w-full rounded-r-md border-[0.5px] border-l-0 border-black bg-white'
-            }
+            css={css`
+                box-sizing: content-box;
+                height: 1.5px;
+                width: 100%;
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+                border: 0.5px solid black;
+                border-left: 0;
+                background-color: white;
+            `}
         />
     </div>
 )
