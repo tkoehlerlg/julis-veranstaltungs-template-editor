@@ -56,11 +56,22 @@ export function useHistory<T>(
     )
 
     const goBack = useCallback(() => {
-        if (currentIndex > 0) setCurrentIndex((prev) => prev - 1)
-    }, [currentIndex])
+        let newIndex = currentIndex
+        if (currentIndex > 0)
+            setCurrentIndex((prev) => {
+                newIndex = prev - 1
+                return newIndex
+            })
+        return history[newIndex]
+    }, [currentIndex, history])
     const goForward = useCallback(() => {
+        let newIndex = currentIndex
         if (currentIndex < history.length - 1)
-            setCurrentIndex((prev) => prev + 1)
+            setCurrentIndex((prev) => {
+                newIndex = prev + 1
+                return newIndex
+            })
+        return history[newIndex]
     }, [currentIndex, history])
 
     return [
