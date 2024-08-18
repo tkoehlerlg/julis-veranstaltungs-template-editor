@@ -1,5 +1,7 @@
 import { HexColorInput, HexColorPicker } from 'react-colorful'
 import { isColorLight } from '@/lib/color'
+import { css } from 'styled-components'
+import { useTheme } from '@/contexts/themeContext'
 
 export type FeaturedColor = {
     name?: string
@@ -17,48 +19,85 @@ export function ColorMenu({
     onColorChange,
     featuredColors,
 }: ColorMenuProps) {
+    const theme = useTheme()
+
     return (
         <div
-            className={
-                'color-picker flex flex-col gap-4 rounded-lg border border-slate-200 bg-white pb-2.5'
-            }
+            className={'color-picker'}
+            css={css`
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                border-radius: 8px;
+                border: 1px solid ${theme.palette.slate[200]};
+                background-color: ${theme.palette.white};
+                padding-bottom: 10px;
+            `}
         >
             <HexColorPicker color={selectedColor} onChange={onColorChange} />
             <div
-                className={
-                    'flex flex-row items-baseline gap-1.5 px-2.5 text-sm font-medium'
-                }
+                css={css`
+                    display: flex;
+                    flex-direction: row;
+                    align-items: baseline;
+                    gap: 6px;
+                    padding: 0 10px;
+                    font-size: ${theme.fontSize.small};
+                    font-weight: 500;
+                `}
             >
                 <p>HEX:</p>
                 <HexColorInput
                     color={selectedColor}
                     onChange={onColorChange}
-                    className={
-                        'w-[72px] rounded-lg bg-slate-100 px-2.5 py-1 text-sm focus:outline-0'
-                    }
+                    css={css`
+                        width: 74px;
+                        border-radius: 8px;
+                        background-color: ${theme.palette.slate[100]};
+                        padding: 10px;
+                        font-size: ${theme.fontSize.small};
+                        outline: none;
+                    `}
                 />
             </div>
-            <div className={'grid grid-cols-4 gap-1.5 px-2.5'}>
+            <div
+                css={css`
+                    display: grid;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 6px;
+                    padding: 0 10px;
+                `}
+            >
                 {featuredColors.map((fc) => (
                     <div
                         key={fc.name}
-                        className={
-                            'flex flex-1 cursor-pointer flex-col items-start gap-1'
-                        }
+                        css={css`
+                            display: flex;
+                            flex: 1;
+                            flex-direction: column;
+                            align-items: start;
+                            gap: 4px;
+                            cursor: pointer;
+                        `}
                         onClick={() => onColorChange?.(fc.color)}
                     >
                         <div
-                            className={`h-11 w-full rounded-lg shadow`}
-                            style={{ backgroundColor: fc.color }}
+                            css={css`
+                                height: 44px;
+                                width: 100%;
+                                border-radius: 8px;
+                                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                                background-color: ${fc.color};
+                            `}
                         />
                         {fc.name && (
                             <p
-                                className={'text-[12px]'}
-                                style={{
-                                    color: isColorLight(fc.color, 0.85)
+                                css={css`
+                                    font-size: 12px;
+                                    color: ${isColorLight(fc.color, 0.85)
                                         ? 'black'
-                                        : fc.color,
-                                }}
+                                        : fc.color};
+                                `}
                             >
                                 {fc.name}
                             </p>
