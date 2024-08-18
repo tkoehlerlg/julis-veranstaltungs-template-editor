@@ -230,7 +230,13 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
     }, [selectedType])
 
     useImperativeHandle(ref, () => ({
-        focusTextArea: () => textAreaRef.current?.focus(),
+        focusTextArea: () => {
+            const textArea = textAreaRef.current
+            if (!textArea) return
+            const inputLength = textArea.value.length
+            textArea.setSelectionRange(inputLength, inputLength)
+            textArea.focus()
+        },
     }))
 
     // Reset selected attribute when switching between selected elements
@@ -299,18 +305,6 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
             >
                 {selectedType === 'background' ? 'Hintergrundfarbe' : 'Farben'}
             </h3>
-            {/*{showApplyOnSimilar && (*/}
-            {/*    <div className='flex items-center space-x-2'>*/}
-            {/*        <Switch*/}
-            {/*            id='apply-on-similar'*/}
-            {/*            checked={applyOnSimilar}*/}
-            {/*            onCheckedChange={onApplyOnSimilarChange}*/}
-            {/*        />*/}
-            {/*        <Label htmlFor='apply-on-similar'>*/}
-            {/*            Auf gleichfarbige anwenden*/}
-            {/*        </Label>*/}
-            {/*    </div>*/}
-            {/*)}*/}
             {selectedType !== 'background' && (
                 <SwitchButton
                     layoutIdExtension={editorId}
