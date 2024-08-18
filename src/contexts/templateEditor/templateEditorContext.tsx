@@ -118,7 +118,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
             categories,
         },
         setTemplateState,
-        { canGoBack, goBack, canGoForward, goForward },
+        historyControl,
     ] = useHistory<TemplateState>({
         backgroundColor: THEME.palette.template.background,
         titleCard: {
@@ -195,6 +195,34 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         },
         [setTemplateState]
     )
+
+    const undo = useCallback(() => {
+        const newState = historyControl.goBack()
+        if (
+            (selected?.type === 'card' &&
+                !newState.cards.find((card) => card.uuid === selected.uuid)) ||
+            (selected?.type === 'category' &&
+                !newState.categories.find(
+                    (category) => category.uuid === selected.uuid
+                ))
+        ) {
+            setSelected(undefined)
+        }
+    }, [historyControl, selected])
+
+    const redo = useCallback(() => {
+        const newState = historyControl.goForward()
+        if (
+            (selected?.type === 'card' &&
+                !newState.cards.find((card) => card.uuid === selected.uuid)) ||
+            (selected?.type === 'category' &&
+                !newState.categories.find(
+                    (category) => category.uuid === selected.uuid
+                ))
+        ) {
+            setSelected(undefined)
+        }
+    }, [historyControl, selected])
 
     useEffect(() => {
         const templateBackgroundColor = localStorage.getItem(
@@ -443,10 +471,10 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 moveCard,
                 getPossibleDirectionsForCard,
                 historyControl: {
-                    canUndo: canGoBack,
-                    canRedo: canGoForward,
-                    undo: goBack,
-                    redo: goForward,
+                    canUndo: historyControl.canGoBack,
+                    canRedo: historyControl.canGoForward,
+                    undo,
+                    redo,
                 },
             }}
         >
