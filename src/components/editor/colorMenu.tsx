@@ -23,7 +23,7 @@ export function ColorMenu({
 
     return (
         <div
-            className={'color-picker'}
+            className={'color-picker'} // in src/styles/globals.css
             css={css`
                 display: flex;
                 flex-direction: column;
