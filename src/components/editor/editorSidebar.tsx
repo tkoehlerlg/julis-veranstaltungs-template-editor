@@ -64,6 +64,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
         getPossibleDirectionsForCard,
         categories,
         updateCategory,
+        resetLocalStorage,
     } = useTemplateEditorContext()
 
     const selectedType = useMemo(() => selected?.type, [selected])
@@ -409,6 +410,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
             dir='column'
             gap={10}
             styles={css`
+                position: relative;
                 height: 100%;
                 width: 100%;
                 background: ${theme.palette.gray[75]};
@@ -431,6 +433,32 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
             >
                 Bitte wähle etwas aus um es hier zu bearbeiten.
             </p>
+            <Flex
+                styles={css`
+                    position: absolute;
+                    width: calc(100% - 32px);
+                    bottom: 32px;
+                    right: 16px;
+                `}
+            >
+                <button
+                    onClick={() => resetLocalStorage()}
+                    css={css`
+                        border: 2px solid ${theme.palette.red[500]};
+                        background-color: ${theme.palette.white};
+                        color: ${theme.palette.red[500]};
+                        min-height: 40px;
+                        padding: 5px 10px;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: ${theme.fontSize.extraSmall};
+                        font-weight: 500;
+                        width: 100%;
+                    `}
+                >
+                    Template zurücksetzen
+                </button>
+            </Flex>
         </Flex>
     )
 })
