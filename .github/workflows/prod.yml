@@ -35,6 +35,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - run: echo "${{ secrets.VERCEL_TOKEN }}"
       - uses: actions/checkout@v2
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
