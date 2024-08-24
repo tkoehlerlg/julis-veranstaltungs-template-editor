@@ -79,6 +79,15 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
                 width: 100%;
                 background: ${theme.palette.gray[75]};
                 padding: 64px 16px 16px;
+                max-height: 100vh;
+                overflow-y: scroll;
+                overscroll-behavior-y: contain;
+                // hide scrollbar
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                &::-webkit-scrollbar {
+                    display: none;
+                }
             `}
         >
             <h2
@@ -96,7 +105,7 @@ const EditorSidebar = forwardRef<IEditorSidebarRef>((_, ref) => {
             <CategoryInput />
             <h3
                 css={css`
-                    margin-top: 16px;
+                    margin-top: 10px;
                     font-size: ${theme.fontSize.medium};
                     font-weight: 600;
                     color: ${theme.palette.gray[600]};
