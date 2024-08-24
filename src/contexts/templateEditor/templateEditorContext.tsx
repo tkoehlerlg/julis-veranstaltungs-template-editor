@@ -344,6 +344,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 title: 'Neues Event',
                 textColor: THEME.palette.template.yellow,
                 backgroundColor: THEME.palette.template.magenta,
+                categoryId: categories[0].uuid ?? null, // TODO: Create new category
             }
             if (atPosition !== undefined) {
                 setCards((prevState) => {

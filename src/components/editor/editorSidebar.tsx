@@ -17,7 +17,7 @@ import {
 } from '@/components/editor/components/colorSection'
 import { ActionMenu } from '@/components/editor/components/actionMenu'
 
-interface IEditorSidebarRef {
+export interface IEditorSidebarRef {
     focusTextArea: () => void
 }
 
