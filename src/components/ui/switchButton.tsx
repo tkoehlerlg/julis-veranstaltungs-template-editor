@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 interface SwitchButtonProps<T extends string> {
     layoutIdExtension?: string
     selected: T
-    options: T[]
+    options: { key: T; label: string }[]
     onChange?: (selected: T) => void
     className?: string
 }
@@ -27,11 +27,11 @@ export function SwitchButton<T extends string>({
         >
             {options.map((option) => (
                 <div
-                    key={option}
+                    key={option.key}
                     className={'relative select-none px-2.5 py-1'}
-                    onClick={() => onChange && onChange(option)}
+                    onClick={() => onChange && onChange(option.key)}
                 >
-                    {selected === option && (
+                    {selected === option.key && (
                         <motion.div
                             layout
                             layoutId={
@@ -45,7 +45,7 @@ export function SwitchButton<T extends string>({
                         />
                     )}
                     <p className={'relative z-10 text-sm font-medium'}>
-                        {option}
+                        {option.label}
                     </p>
                 </div>
             ))}

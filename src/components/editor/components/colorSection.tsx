@@ -146,11 +146,14 @@ const ColorSection = forwardRef<ColorSectionRef, ColorSectionProps>(
                     <SwitchButton
                         layoutIdExtension={id}
                         selected={selectedAttribute}
-                        options={
+                        options={(
                             Object.keys(
                                 ColorPickerAttributeLabel
                             ) as ColorPickerAttribute[]
-                        }
+                        ).map((key) => ({
+                            key,
+                            label: ColorPickerAttributeLabel[key],
+                        }))}
                         onChange={setSelectedAttribute}
                     />
                 )}
