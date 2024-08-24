@@ -39,6 +39,7 @@ interface IEditorContent {
     titleCard: ITitleCard
     updateTitleCard: (card: Partial<ITitleCard>) => void
     cards: IEventCard[]
+    cardsMap: Map<string, IEventCard>
     addCard: (atPosition?: number) => void
     updateCard(uuid: string, card: Partial<IEventCard>): void
     deleteCard: (uuid: string) => void
@@ -46,6 +47,7 @@ interface IEditorContent {
     getPossibleDirectionsForCard: (uuid: string) => Directions[]
     editorSidebarRef?: RefObject<IEditorSidebarRef>
     categories: ICategory[]
+    categoriesMap: Map<string, ICategory>
     updateCategory: (uuid: string, category: Partial<ICategory>) => void
     focusEditorSidebarTitle: () => void
     historyControl: {
@@ -73,12 +75,14 @@ const TemplateEditorContext = createContext<IEditorContent>({
     },
     updateTitleCard: () => didNotInitAlert,
     cards: [],
+    cardsMap: new Map(),
     addCard: () => didNotInitAlert,
     updateCard: () => didNotInitAlert,
     deleteCard: () => didNotInitAlert,
     moveCard: () => didNotInitAlert,
     getPossibleDirectionsForCard: () => [],
     categories: [],
+    categoriesMap: new Map(),
     updateCategory: () => didNotInitAlert,
     editorSidebarRef: undefined,
     focusEditorSidebarTitle: () => didNotInitAlert,
@@ -141,6 +145,8 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
             },
         ],
     })
+    const cardsMap = new Map(cards.map((card) => [card.uuid, card]))
+    const categoriesMap = new Map(categories.map((cat) => [cat.uuid, cat]))
     const editorSidebarRef = useRef<IEditorSidebarRef>(null)
 
     const setTemplateBackgroundColor = useCallback(
@@ -461,10 +467,12 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 titleCard,
                 updateTitleCard,
                 cards,
+                cardsMap,
                 addCard,
                 updateCard,
                 deleteCard,
                 categories,
+                categoriesMap,
                 updateCategory,
                 editorSidebarRef,
                 focusEditorSidebarTitle,

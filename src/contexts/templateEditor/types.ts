@@ -30,7 +30,7 @@ export const titleCardSchema = z.object({
 
 export interface IEventCard extends ICardStyles {
     uuid: string
-    categoryId?: string
+    categoryId: string | null
     title: string
 }
 

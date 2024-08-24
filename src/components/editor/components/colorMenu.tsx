@@ -2,11 +2,7 @@ import { HexColorInput, HexColorPicker } from 'react-colorful'
 import { isColorLight } from '@/lib/color'
 import { css } from 'styled-components'
 import { useTheme } from '@/contexts/themeContext'
-
-export type FeaturedColor = {
-    name?: string
-    color: string
-}
+import { FeaturedColor } from '../types'
 
 interface ColorMenuProps {
     selectedColor: string

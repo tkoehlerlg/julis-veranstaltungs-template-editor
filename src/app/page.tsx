@@ -5,7 +5,7 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable'
-import { EditorSidebar } from '@/components/editor'
+import { EditorSidebar } from '@/components/editor/editorSidebar'
 import {
     TemplateEditorContextProvider,
     useTemplateEditorContext,

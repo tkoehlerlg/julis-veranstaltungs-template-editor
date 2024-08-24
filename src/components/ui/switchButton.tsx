@@ -1,21 +1,21 @@
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
-interface SwitchButtonProps {
+interface SwitchButtonProps<T extends string> {
     layoutIdExtension?: string
-    selected: string
-    options: string[]
-    onChange?: (selected: string) => void
+    selected: T
+    options: T[]
+    onChange?: (selected: T) => void
     className?: string
 }
 
-export function SwitchButton({
+export function SwitchButton<T extends string>({
     layoutIdExtension,
     selected,
     options,
     onChange,
     className,
-}: SwitchButtonProps) {
+}: SwitchButtonProps<T>) {
     return (
         <div
             className={cn(
