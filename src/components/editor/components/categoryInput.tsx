@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Flex } from '@/components/common/Flex'
 import { css } from 'styled-components'
 import { Label } from '@/components/ui/label'
@@ -6,16 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useTheme } from '@/contexts/themeContext'
 import { useTemplateEditorContext } from '@/contexts/templateEditor'
-
-/*
- *     const [categoryIFValue, setCategoryIFValue] = useState('')
- *     useEffect(
- *         () =>
- *             selectedCardsCategory &&
- *             setCategoryIFValue(selectedCardsCategory.name),
- *         [selectedCardsCategory]
- *     )
- */
+import { noOp } from '@/utils/types'
 
 export function CategoryInput() {
     const theme = useTheme()
@@ -33,6 +24,14 @@ export function CategoryInput() {
         return categoriesMap.get(selectedCard.categoryId)
     }, [selected, cardsMap, categoriesMap])
 
+    useEffect(
+        () =>
+            selectedCardsCategory
+                ? setInputValue(selectedCardsCategory.name)
+                : noOp,
+        [selectedCardsCategory]
+    )
+
     if (selected?.type !== 'card') return null
 
     return (
@@ -40,7 +39,7 @@ export function CategoryInput() {
             dir='column'
             gap={6}
             styles={css`
-                padding-top: 10px;
+                padding-top: 6px;
                 width: 100%;
             `}
         >
