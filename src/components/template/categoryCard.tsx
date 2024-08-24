@@ -35,7 +35,7 @@ export function CategoryCard({ category }: { category: ICategory }) {
                 justify-content: center;
                 position: relative;
                 min-height: 16px;
-                min-width: 80px;
+                min-width: 100px;
                 cursor: pointer;
             `}
         >
@@ -54,24 +54,28 @@ export function CategoryCard({ category }: { category: ICategory }) {
                         : theme.palette.white};
                 `}
             />
-            <p
-                onClick={() => setTimeout(() => focusEditorSidebarTitle(), 10)}
-                css={css`
-                    position: relative;
-                    cursor: text;
-                    white-space: pre-line;
-                    padding: 1.5px 50px;
-                    text-align: center;
-                    font-family: ${theme.font.montserrat};
-                    font-size: ${theme.fontSize.extraTiny};
-                    font-weight: 900;
-                    color: ${category.name === ''
-                        ? theme.palette.whiteOpacity[500]
-                        : category.textColor};
-                `}
-            >
-                {category.name === '' ? 'Kategorie Name' : category.name}
-            </p>
+            <div style={{ padding: '0 30px' }}>
+                <p
+                    onClick={() =>
+                        setTimeout(() => focusEditorSidebarTitle(), 10)
+                    }
+                    css={css`
+                        position: relative;
+                        cursor: text;
+                        white-space: pre-line;
+                        padding: 1.5px 10px;
+                        text-align: center;
+                        font-family: ${theme.font.montserrat};
+                        font-size: ${theme.fontSize.extraTiny};
+                        font-weight: 900;
+                        color: ${category.name === ''
+                            ? theme.palette.whiteOpacity[500]
+                            : category.textColor};
+                    `}
+                >
+                    {category.name === '' ? 'Kategorie Name' : category.name}
+                </p>
+            </div>
         </div>
     )
 }
