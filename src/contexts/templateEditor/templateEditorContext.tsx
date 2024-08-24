@@ -357,7 +357,7 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
             }
             setSelected({ type: 'card', uuid: newCard.uuid })
         },
-        [setCards]
+        [categories, setCards]
     )
 
     const updateCard = useCallback(
