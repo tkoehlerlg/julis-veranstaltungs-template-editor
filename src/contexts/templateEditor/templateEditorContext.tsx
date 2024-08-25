@@ -15,6 +15,7 @@ import {
     Selection,
     ICategory,
     categorySchema,
+    ICreateCategory,
 } from './types'
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid'
 import { ChildProps } from '@/lib/propTypes'
@@ -48,7 +49,14 @@ interface IEditorContent {
     editorSidebarRef?: RefObject<IEditorSidebarRef>
     categories: ICategory[]
     categoriesMap: Map<string, ICategory>
-    updateCategory: (uuid: string, category: Partial<ICategory>) => void
+    addCategory: (newCategory: ICreateCategory) => ICategory
+    updateCategory: (
+        uuid: string,
+        category:
+            | ((prevState: ICategory) => Partial<ICategory>)
+            | Partial<ICategory>
+    ) => void
+    deleteCategory: (uuid: string) => void
     focusEditorSidebarTitle: () => void
     historyControl: {
         canUndo: boolean
@@ -60,6 +68,9 @@ interface IEditorContent {
 
 const didNotInitAlert = () =>
     console.log('You did not initiate TemplateEditorContext')
+function throwNotInitError<T>(): T {
+    throw new Error('You did not initiate TemplateEditorContext')
+}
 
 const TemplateEditorContext = createContext<IEditorContent>({
     isLoadingFromLocalStorage: false,
@@ -83,7 +94,9 @@ const TemplateEditorContext = createContext<IEditorContent>({
     getPossibleDirectionsForCard: () => [],
     categories: [],
     categoriesMap: new Map(),
+    addCategory: () => throwNotInitError<ICategory>(),
     updateCategory: () => didNotInitAlert,
+    deleteCategory: () => didNotInitAlert,
     editorSidebarRef: undefined,
     focusEditorSidebarTitle: () => didNotInitAlert,
     historyControl: {
@@ -422,16 +435,38 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
         [cards]
     )
 
+    const addCategory = useCallback(
+        (newCategory: ICreateCategory) => {
+            const newCategoryWithUuid = {
+                ...defaultStyle,
+                ...newCategory,
+                uuid: uuidv4(),
+            }
+            setCategories((prevState) => [...prevState, newCategoryWithUuid])
+            return newCategoryWithUuid
+        },
+        [setCategories]
+    )
+
     const updateCategory = useCallback(
-        (uuid: string, category: Partial<ICategory>) => {
-            setCategories((prevState) =>
-                prevState.map((cat) =>
-                    cat.uuid === uuid ? { ...cat, ...category } : cat
+        (
+            uuid: string,
+            category:
+                | ((prevState: ICategory) => Partial<ICategory>)
+                | Partial<ICategory>
+        ) => {
+            const toUpdate = categories.find((cat) => cat.uuid === uuid)
+            if (!toUpdate) return
+            const updatedCategory =
+                typeof category === 'function' ? category(toUpdate) : category
+            setCategories((prevState) => {
+                return prevState.map((cat) =>
+                    cat.uuid === uuid ? { ...cat, ...updatedCategory } : cat
                 )
-            )
+            })
             if (
-                category.textColor === undefined &&
-                category.backgroundColor === undefined
+                updatedCategory.textColor === undefined &&
+                updatedCategory.backgroundColor === undefined
             ) {
                 return
             }
@@ -440,16 +475,35 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                     card.categoryId === uuid
                         ? {
                               ...card,
-                              textColor: category.textColor ?? card.textColor,
+                              textColor:
+                                  updatedCategory.textColor ?? card.textColor,
                               backgroundColor:
-                                  category.backgroundColor ??
+                                  updatedCategory.backgroundColor ??
                                   card.backgroundColor,
                           }
                         : card
                 )
             )
         },
-        [setCategories, setCards]
+        [categories, setCategories, setCards]
+    )
+
+    const deleteCategory = useCallback(
+        (uuid: string) => {
+            setCategories((prevState) =>
+                prevState.filter((cat) => cat.uuid !== uuid)
+            )
+            setCards((prevState) =>
+                prevState.map((card) =>
+                    card.categoryId === uuid
+                        ? { ...card, categoryId: null }
+                        : card
+                )
+            )
+            if (selected?.type === 'category' && selected.uuid === uuid)
+                setSelected(undefined)
+        },
+        [selected, setCategories, setCards]
     )
 
     const focusEditorSidebarTitle = useCallback(() => {
@@ -474,7 +528,9 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                 deleteCard,
                 categories,
                 categoriesMap,
+                addCategory,
                 updateCategory,
+                deleteCategory,
                 editorSidebarRef,
                 focusEditorSidebarTitle,
                 moveCard,

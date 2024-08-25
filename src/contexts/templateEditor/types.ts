@@ -47,6 +47,10 @@ export interface ICategory extends ICardStyles {
     name: string
 }
 
+export interface ICreateCategory
+    extends Omit<ICategory, 'uuid' | keyof ICardStyles>,
+        Partial<ICardStyles> {}
+
 export const categorySchema = z.object({
     uuid: z.string().uuid(),
     name: z.string(),
