@@ -125,6 +125,7 @@ function TemplateEditor() {
                             >
                                 <TitleCard />
                                 <AddButton
+                                    index={0}
                                     onClick={() => addCard(0)}
                                     styles={
                                         cards.length === 0
@@ -137,9 +138,13 @@ function TemplateEditor() {
                                 />
                                 <div className={'relative flex flex-col gap-1'}>
                                     {cards.map((card, index) => (
-                                        <div key={card.uuid}>
+                                        <div
+                                            key={card.uuid}
+                                            data-testid={'card-box'}
+                                        >
                                             <EventCard card={card} />
                                             <AddButton
+                                                index={index + 1}
                                                 paddingTop={6.5}
                                                 paddingBottom={
                                                     index === cards.length - 1

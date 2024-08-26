@@ -64,6 +64,7 @@ export function ActionMenu() {
                     Löschen
                 </button>
                 <button
+                    data-testid={'move-up'}
                     // prettier-ignore
                     disabled={ !possibleDirectionsForCard?.includes('up') }
                     onClick={() => moveCard(selected.uuid, 'up')}
@@ -83,6 +84,7 @@ export function ActionMenu() {
                     <ChevronUp />
                 </button>
                 <button
+                    data-testid={'move-down'}
                     // prettier-ignore
                     disabled={ !possibleDirectionsForCard?.includes('down') }
                     onClick={() => moveCard(selected.uuid, 'down')}

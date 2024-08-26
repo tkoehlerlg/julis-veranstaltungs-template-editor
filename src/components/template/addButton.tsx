@@ -3,11 +3,13 @@ import { CssStyles } from '@/lib/propTypes'
 import { css } from 'styled-components'
 
 export const AddButton = ({
+    index,
     onClick,
     paddingTop = 0,
     paddingBottom = 0,
     styles,
 }: {
+    index: number
     onClick?: () => void
     paddingTop?: number
     paddingBottom?: number
@@ -51,6 +53,7 @@ export const AddButton = ({
             `}
         />
         <div
+            data-testid={`add-card-${index}`}
             css={css`
                 display: flex;
                 height: 14px;
