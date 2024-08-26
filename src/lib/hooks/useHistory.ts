@@ -9,9 +9,10 @@ export function useHistory<T>(
     const [currentIndex, setCurrentIndex] = useState(0)
     const [lastUpdateTime, setLastUpdateTime] = useState(Date.now())
 
-    const currentState = useMemo(() => {
-        return history[currentIndex]
-    }, [history, currentIndex])
+    const currentState = useMemo(
+        () => history[Math.min(currentIndex, history.length - 1)],
+        [history, currentIndex]
+    )
 
     const updateState = useCallback(
         (newState: T | ((prevState: T) => T), createNewHistory = true) => {
@@ -24,16 +25,20 @@ export function useHistory<T>(
             }
             if (createNewHistory) {
                 setLastUpdateTime(now)
-                setHistory((prev) => [
-                    ...prev.slice(
-                        Math.max(0, prev.length - maxHistory + 1),
-                        currentIndex + 1
-                    ),
-                    typeof newState === 'function'
-                        ? (newState as (prevState: T) => T)(prev[currentIndex])
-                        : newState,
-                ])
-                setCurrentIndex((prev) => prev + 1)
+                setCurrentIndex((prevIndex) => {
+                    setHistory((prevState) => [
+                        ...prevState.slice(
+                            Math.max(0, prevState.length - maxHistory + 1),
+                            prevIndex + 1
+                        ),
+                        typeof newState === 'function'
+                            ? (newState as (prevState: T) => T)(
+                                  prevState[prevIndex]
+                              )
+                            : newState,
+                    ])
+                    return prevIndex + 1
+                })
             } else {
                 setHistory((prev) => [
                     ...prev.slice(

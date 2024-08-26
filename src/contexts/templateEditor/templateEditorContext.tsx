@@ -56,7 +56,7 @@ interface IEditorContent {
             | ((prevState: ICategory) => Partial<ICategory>)
             | Partial<ICategory>
     ) => void
-    deleteCategory: (uuid: string) => void
+    deleteCategory: (uuid: string, replaceWith?: string) => void
     focusEditorSidebarTitle: () => void
     historyControl: {
         canUndo: boolean
@@ -270,6 +270,11 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                         }),
                         false
                     )
+                } else {
+                    console.error(
+                        'Error parsing titleCard',
+                        parsedTitleCard.error
+                    )
                 }
             }
 
@@ -286,6 +291,8 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                         }),
                         false
                     )
+                } else {
+                    console.error('Error parsing cards', parsedCards.error)
                 }
             }
 
@@ -301,6 +308,11 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
                             categories: parsedCategories.data,
                         }),
                         false
+                    )
+                } else {
+                    console.error(
+                        'Error parsing categories',
+                        parsedCategories.error
                     )
                 }
             }
@@ -489,14 +501,14 @@ export function TemplateEditorContextProvider({ children }: ChildProps) {
     )
 
     const deleteCategory = useCallback(
-        (uuid: string) => {
+        (uuid: string, replaceWith?: string) => {
             setCategories((prevState) =>
                 prevState.filter((cat) => cat.uuid !== uuid)
             )
             setCards((prevState) =>
                 prevState.map((card) =>
                     card.categoryId === uuid
-                        ? { ...card, categoryId: null }
+                        ? { ...card, categoryId: replaceWith ?? null }
                         : card
                 )
             )

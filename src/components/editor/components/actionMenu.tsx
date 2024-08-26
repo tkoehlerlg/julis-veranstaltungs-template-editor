@@ -8,8 +8,13 @@ import { useTemplateEditorContext } from '@/contexts/templateEditor'
 export function ActionMenu() {
     const theme = useTheme()
 
-    const { selected, deleteCard, moveCard, getPossibleDirectionsForCard } =
-        useTemplateEditorContext()
+    const {
+        selected,
+        deleteCard,
+        moveCard,
+        getPossibleDirectionsForCard,
+        deleteCategory,
+    } = useTemplateEditorContext()
 
     const possibleDirectionsForCard = useMemo(
         () =>
@@ -19,7 +24,15 @@ export function ActionMenu() {
         [getPossibleDirectionsForCard, selected]
     )
 
-    if (selected?.type !== 'card') return null
+    const onClickDelete = () => {
+        if (selected?.type === 'card') {
+            deleteCard(selected.uuid)
+        } else if (selected?.type === 'category') {
+            deleteCategory(selected.uuid)
+        }
+    }
+
+    if (selected?.type !== 'card' && selected?.type !== 'category') return null
 
     return (
         <Fragment>
@@ -35,7 +48,7 @@ export function ActionMenu() {
             </h3>
             <Flex dir='row' align='center' gap={5}>
                 <button
-                    onClick={() => deleteCard(selected.uuid)}
+                    onClick={onClickDelete}
                     css={css`
                         flex: 1;
                         grid-column: span 2;

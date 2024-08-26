@@ -13,6 +13,7 @@ export const CategoriesContainer = ({
         align={'center'}
         wrap={'wrap'}
         justify={'center'}
+        gap={3}
         styles={css`
             margin: 0 50px;
             min-width: 100px;
